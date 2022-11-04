@@ -1,6 +1,5 @@
 #include "matrix.hpp"
 #include <bits/stdc++.h>
-#include <cstddef>
 
 linalg::Matrix::Matrix(std::vector<size_t> &I, std::vector<size_t> &J,
                        std::vector<double> &val) {
@@ -17,22 +16,22 @@ linalg::Matrix::Matrix(std::vector<size_t> &I, std::vector<size_t> &J,
   }
 }
 
-std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
-}
+// std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
+// }
 
-std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
-}
+// std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
+// }
 
 void linalg::Matrix::set(size_t i, size_t j, double val) {
   // Find the iterator at i and j
-  auto it = std::find(_data.begin(), _data.end(),
+  auto it = std::find_if(_data.begin(), _data.end(),
                       [&](const auto &a) { return i == a.I && j == a.J; });
-
+  
   // If found update to new value and if not add to the end of the vector
   if (it != _data.end()) {
     it->val = val;
   } else {
-    coo new_value;
+    linalg::coo new_value;
     new_value.I = i;
     new_value.J = j;
     new_value.val = val;
@@ -42,8 +41,8 @@ void linalg::Matrix::set(size_t i, size_t j, double val) {
 
 double linalg::Matrix::at(size_t i, size_t j) {
   // Find position i,j
-  auto it = std::find(_data.cbegin(), _data.cend(),
-                      [&](const auto &a) { return i == a.I && j == a.J; });
+  auto it = std::find_if(_data.cbegin(), _data.cend(),
+                      [&](const auto a) { return i == a.I && j == a.J; });
 
   // If that position exists return the value, if not return 0
   if (it != _data.cend()) {
@@ -78,4 +77,4 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
   return col;
 }
 
-linalg::Matrix linalg::Matrix::getInverse() {}
+// linalg::Matrix linalg::Matrix::getInverse() {}

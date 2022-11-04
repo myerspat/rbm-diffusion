@@ -2,12 +2,12 @@
 
 namespace linalg {
 
-std::pair<std::vector<double>, double> powerIteration(Mesh mesh) {}
+// std::pair<std::vector<double>, double> powerIteration(Mesh mesh) {}
 
-double norm(double *vec) {}
+// double norm(double *vec) {}
 
-double dot(double *vec1, double *vec2) {}
+// double dot(double *vec1, double *vec2) {}
 
-double **inv(double **mat) {}
+// double **inv(double **mat) {}
 
 } // namespace linalg

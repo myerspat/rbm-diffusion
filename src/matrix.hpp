@@ -2,7 +2,6 @@
 #define _MATRIX_
 
 #include <cstddef>
-#include <map>
 #include <utility>
 #include <vector>
 
