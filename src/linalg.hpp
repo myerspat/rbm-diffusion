@@ -2,13 +2,18 @@
 #define _LINALG_
 
 #include "mesh.hpp"
+#include "matrix.hpp"
+#include <utility>
+#include <vector>
 
-class Linalg {
-public:
-  Linalg();
-  ~Linalg();
+namespace linalg {
 
-private:
-};
+std::pair<std::vector<double>, double> powerIteration(Matrix A);
+
+double norm(std::vector<double> vec);
+
+double dot(std::vector<double> vec1, std::vector<double> vec2);
+
+} // namespace linalg
 
 #endif // !_LINALG_
