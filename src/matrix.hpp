@@ -17,13 +17,14 @@ struct coo {
 class Matrix {
 private:
   // Data
-  std::vector<coo> _data; // vector of I, J, val
+  std::vector<coo> _data;          // vector of I, J, val
+  std::pair<size_t, size_t> _size; // Holds the size of the matrix (MxN)
 
 public:
   // Constructors / Destructor
-  Matrix(){};
+  Matrix(const size_t m, const size_t n) : _size(std::make_pair(m, n)){};
   Matrix(std::vector<size_t> &I, std::vector<size_t> &J,
-         std::vector<double> &val);
+         std::vector<double> &val, const size_t m, const size_t n);
 
   // Methods
   // Matrix vector multiplication
@@ -49,6 +50,12 @@ public:
 
   // Get matrix inverse
   Matrix getInverse();
+
+  // Get the size of the matrix
+  std::pair<size_t, size_t> size() { return _size; };
+
+  // Scalar Operations
+  Matrix operator*(double);
 };
 
 } // namespace linalg
