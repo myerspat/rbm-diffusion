@@ -48,6 +48,9 @@ std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
 }
 
 void linalg::Matrix::set(size_t i, size_t j, double val) {
+  // Assert the indicies are within the matrix bounds
+  assert(i < _size.first && j < _size.second);
+
   // Find the iterator at i and j
   auto it = std::find_if(_data.begin(), _data.end(),
                          [&](const auto &a) { return i == a.I && j == a.J; });
@@ -69,6 +72,9 @@ void linalg::Matrix::set(size_t i, size_t j, double val) {
 }
 
 double linalg::Matrix::at(size_t i, size_t j) {
+  // Assert the indicies are within the matrix bounds
+  assert(i < _size.first && j < _size.second);
+  
   // Find position i,j
   auto it = std::find_if(_data.cbegin(), _data.cend(),
                          [&](const auto a) { return i == a.I && j == a.J; });
@@ -81,6 +87,9 @@ double linalg::Matrix::at(size_t i, size_t j) {
 }
 
 std::vector<double> linalg::Matrix::getRow(const size_t i) {
+  // Assert the indicies are within the matrix bounds
+  assert(i < _size.first);
+
   // Initialize row vector
   std::vector<double> row(_size.second, 0.0);
 
@@ -94,6 +103,9 @@ std::vector<double> linalg::Matrix::getRow(const size_t i) {
 }
 
 std::vector<double> linalg::Matrix::getColumn(const size_t j) {
+  // Assert the indicies are within the matrix bounds
+  assert(j < _size.second);
+
   // Initialize row vector
   std::vector<double> col(_size.first, 0.0);
 
