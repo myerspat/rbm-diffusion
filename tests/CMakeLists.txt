@@ -1,11 +1,12 @@
 # Add new header files here
 set(HEADER_FILES
-  unit_test_framework
+  unit_test_framework.hpp
 )
 
 # Add new source files here
 set(SOURCE_FILES
   test_matrix.cpp
+  test_linalg.cpp
 )
 
 set(LIBRARY_NAME cpplib)
