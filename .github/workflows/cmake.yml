@@ -1,0 +1,58 @@
+name: CMake
+
+on:
+  pull_request:
+    types: [review_requested, ready_for_review]
+
+jobs:
+  build:
+    name: ${{compiler.config.name}}
+    runs-on: ${{compiler.config.os}}
+    strategy:
+      fail-fast: true
+      compiler:
+        config:
+        - {
+            name: "Ubuntu Latest GCC",
+            os: ubuntu-latest,
+            build_type: "Coverage", cc: "gcc", cxx: "g++"
+          }
+        - {
+          name: "Ubuntu Latest Clang"
+          os: ubuntu-latest,
+          build_type: "Coverage", cc: "clang", cxx: "clang++"
+          }
+        - {
+          name: "Windows Latest MSVC",
+          os: windows-latest,
+          build_type: "Release", cc: "cl", cxx "cl"
+          }
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Create build environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+      
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+      env:
+        BUILD_TYPE: ${{compiler.config.build_type}}
+        CC: ${{compiler.config.cc}}
+        CXX: ${{compiler.config.cxx}}
+      
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+      env:
+        BUILD_TYPE: ${{compiler.config.build_type}}
+
+    - name: Unit Tests
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      if: ${{ compiler.config.os == 'ubuntu-latest' }}
+      run: make test
