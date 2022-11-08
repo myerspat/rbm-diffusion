@@ -41,4 +41,31 @@ TEST(power_iteration) {
   ASSERT_ALMOST_EQUAL(solution.second, correct_k, 0.00001);
 }
 
+TEST(matrix_vector_1) {
+  // Initialize matrix
+  linalg::Matrix mat(2, 3);
+  std::vector<double> vet{{2}, {1}, {0}};
+
+  mat.set(0, 0, 1);
+  mat.set(0, 1, -1);
+  mat.set(0, 2, 2);
+  mat.set(1, 0, 0);
+  mat.set(1, 1, -3);
+  mat.set(1, 2, 1);
+
+  std::vector<double> vet_correct{{1}, {-3}};
+  int correct_size = 2; 
+
+  std::vector<double> vect_solution = linalg::Matrix::matvec(vet) ;
+
+
+  ASSERT_EQUAL(vect_solution.size(), correct_size);
+
+  // Assertions
+  for (size_t i = 0; i < 2; i++) {
+    ASSERT_ALMOST_EQUAL(vect_solution[i], vet_correct[i], 0.00001);
+  }
+  
+}
+
 TEST_MAIN();
