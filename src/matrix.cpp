@@ -31,7 +31,7 @@ std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
 
   // For each element in _data iterate through the row of mat at element.I and col at element.J
   for (auto& element : _data) {
-    result[element.I] += element.val * col_vec[element.J]
+    result[element.I] += element.val * col_vec[element.J];
   }
 
   return result;
