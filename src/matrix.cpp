@@ -106,7 +106,7 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
 
 linalg::Matrix linalg::Matrix::getInverse(Matrix &mat) {
   Matrix result(_size.first, _size.second);
-
+ 
   return result;
 }
 
