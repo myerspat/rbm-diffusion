@@ -29,6 +29,15 @@ std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
 
 std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
   std::vector<double> result(_size.second, 0);
+
+  // Assert rows of  mat == cols of vec
+  assert(_size.first == row_vec.size());
+
+  // For each element in _data iterate through the row of mat at element.I and col at element.J
+  for (auto& element : _data) {
+    result[element.J] += row_vec[element.I] * element.val;
+  }
+
   return result;
 }
 
