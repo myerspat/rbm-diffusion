@@ -7,6 +7,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
   test_matrix.cpp
   test_linalg.cpp
+  test_mesh.cpp
 )
 
 set(LIBRARY_NAME cpplib)

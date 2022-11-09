@@ -22,6 +22,7 @@ private:
 
 public:
   // Constructors / Destructor
+  Matrix(){};
   Matrix(const size_t m, const size_t n) : _size(std::make_pair(m, n)){};
   Matrix(std::vector<size_t> &I, std::vector<size_t> &J,
          std::vector<double> &val, const size_t m, const size_t n);
