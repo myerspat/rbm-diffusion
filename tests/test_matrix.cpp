@@ -60,9 +60,68 @@ TEST(determinant_test) {
 
   int val_solution = mat.determinantOfMatrix();
 
-  std::cout << "determinant_test val is: " << val_solution;
-
   ASSERT_ALMOST_EQUAL(val_solution, correct_val, 0.00001);
+}
+
+TEST(adjoint_test) {
+  // Initialize matrix
+  linalg::Matrix mat(4, 4);
+
+  mat.set(0, 0, 5);
+  mat.set(0, 1, -2);
+  mat.set(0, 2, 2);
+  mat.set(0, 3, 7);
+  mat.set(1, 0, 1);
+  mat.set(1, 1, 0);
+  mat.set(1, 2, 0);
+  mat.set(1, 3, 3);
+  mat.set(2, 0, -3);
+  mat.set(2, 1, 1);
+  mat.set(2, 2, 5);
+  mat.set(2, 3, 0);
+  mat.set(3, 0, 3);
+  mat.set(3, 1, -1);
+  mat.set(3, 2, -9);
+  mat.set(3, 3, 4);
+
+  linalg::Matrix mat_correct(4, 4);
+  mat_correct.set(0, 0, -12);
+  mat_correct.set(0, 1, 76);
+  mat_correct.set(0, 2, -60);
+  mat_correct.set(0, 3, -36);
+  mat_correct.set(1, 0, -56);
+  mat_correct.set(1, 1, 208);
+  mat_correct.set(1, 2, -82);
+  mat_correct.set(1, 3, -58);
+  mat_correct.set(2, 0, 4);
+  mat_correct.set(2, 1, 4);
+  mat_correct.set(2, 2, -2);
+  mat_correct.set(2, 3, -10);
+  mat_correct.set(3, 0, 4);
+  mat_correct.set(3, 1, 4);
+  mat_correct.set(3, 2, 20);
+  mat_correct.set(3, 3, 12);
+
+  linalg::Matrix mat_solution = mat.adjoint();
+
+  ASSERT_EQUAL(mat_solution.at(0, 0), mat_correct.at(0, 0));
+  ASSERT_EQUAL(mat_solution.at(0, 1), mat_correct.at(0, 1));
+  ASSERT_EQUAL(mat_solution.at(0, 2), mat_correct.at(0, 2));
+  ASSERT_EQUAL(mat_solution.at(0, 3), mat_correct.at(0, 3));
+  ASSERT_EQUAL(mat_solution.at(1, 0), mat_correct.at(1, 0));
+  ASSERT_EQUAL(mat_solution.at(1, 1), mat_correct.at(1, 1));
+  ASSERT_EQUAL(mat_solution.at(1, 2), mat_correct.at(1, 2));
+  ASSERT_EQUAL(mat_solution.at(1, 3), mat_correct.at(1, 3));
+  ASSERT_EQUAL(mat_solution.at(2, 0), mat_correct.at(2, 0));
+  ASSERT_EQUAL(mat_solution.at(2, 1), mat_correct.at(2, 1));
+  ASSERT_EQUAL(mat_solution.at(2, 2), mat_correct.at(2, 2));
+  ASSERT_EQUAL(mat_solution.at(2, 3), mat_correct.at(2, 3));
+  ASSERT_EQUAL(mat_solution.at(3, 0), mat_correct.at(3, 0));
+  ASSERT_EQUAL(mat_solution.at(3, 1), mat_correct.at(3, 1));
+  ASSERT_EQUAL(mat_solution.at(3, 2), mat_correct.at(3, 2));
+  ASSERT_EQUAL(mat_solution.at(3, 3), mat_correct.at(3, 3));
+
+
 }
 
 TEST_MAIN();

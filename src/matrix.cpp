@@ -119,9 +119,6 @@ linalg::Matrix linalg::Matrix::operator*(double scalar) {
   return mat;
 }
 
-/// --------------------------------------------------
-// void linalg::Matrix::set(size_t i, size_t j, double val) {
-//  void linalg::Matrix::subMatrix(int mat[N][N], int temp[N][N], int p, int q, int n) {
 linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n) {
   // Initialize temp matrix
   Matrix temp(n, n);
@@ -136,22 +133,21 @@ linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n) {
       if (element.J > q)
         new_col--;
 
+      size_t new_row = element.I;
+      if (element.I > p)
+        new_row--;
+
       // Set the value of the temp matrix
-      temp.set(element.I - 1, new_col, element.val);
+      temp.set(new_row, new_col, element.val);
+
     }
   }
   return temp;
 }
 
-// double linalg::Matrix::at(size_t i, size_t j) {
-// int linalg::Matrix::determinantOfMatrix(int matrix[N][N], int n) {
-//  matrix can be found with _data
-//  N = _size.first
-//  n = _size.first
 double linalg::Matrix::determinantOfMatrix() {
   // Assert  matrix is square
   assert(_size.second == _size.first);
-  // Matrix mat(_size.first, _size.second);
   int n = _size.first;
 
   double determinant = 0;
@@ -161,7 +157,6 @@ double linalg::Matrix::determinantOfMatrix() {
   else if (n == 2) {
     return (at(0, 0) * at(1, 1)) - (at(0, 1) * at(1, 0));
   }
-  // int temp[N][N];
   int sign = 1;
   for (int i = 0; i < n; i++) {
     Matrix temp = subMatrix(0, i, n - 1);
@@ -169,4 +164,25 @@ double linalg::Matrix::determinantOfMatrix() {
     sign = -sign;
   }
   return determinant;
+}
+
+linalg::Matrix linalg::Matrix::adjoint() {
+  // Initialize temp matrix
+  Matrix ADJ(_size.first, _size.second);
+
+  int n = _size.first;
+  if (n == 1) {
+    ADJ.set(0,0,1);
+    return ADJ;
+  }
+  int sign = 1;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      Matrix temp = subMatrix(i, j, n-1);
+      sign = ((i + j) % 2 == 0) ? 1 : -1;
+      ADJ.set(j,i, (sign) * temp.determinantOfMatrix());
+      printf("%d %d\n", (int)i, (int)j);
+    }
+  }  
+  return ADJ;
 }

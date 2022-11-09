@@ -62,6 +62,9 @@ public:
 
   //  find the determinant 
   double determinantOfMatrix();
+
+  //  find the adjoint
+  Matrix adjoint();
 };
 
 } // namespace linalg
