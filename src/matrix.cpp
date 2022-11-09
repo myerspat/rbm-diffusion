@@ -1,5 +1,6 @@
 #include "matrix.hpp"
 #include <bits/stdc++.h>
+#include <stdexcept>
 
 linalg::Matrix::Matrix(std::vector<size_t> &I,
                        std::vector<size_t> &J,
@@ -104,6 +105,16 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
 
 linalg::Matrix linalg::Matrix::getInverse() {
   Matrix result(_size.first, _size.second);
+  double determinant = 0;
+  determinant = this->determinantOfMatrix();
+  if(determinant == 0){
+    throw std::runtime_error("Matrix not invertable"); 
+  }
+
+  Matrix ADJ = this->adjoint();
+
+  result= ADJ*(1/determinant);
+
 
   return result;
 }
