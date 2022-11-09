@@ -25,8 +25,7 @@
 int main(int argc, char *argv[]) {
   // Check that two arguments are given in the command line
   if (argc < 3) {
-    throw std::runtime_error("Usage: " + std::string(argv[0]) +
-                             " [number-of-nodes] [target-parameter-value]\n");
+    throw std::runtime_error("Usage: " + std::string(argv[0]) + " [number-of-nodes] [target-parameter-value]\n");
   }
 
   // Number of nodes in the mesh
@@ -34,27 +33,38 @@ int main(int argc, char *argv[]) {
 
   // Target macroscopic xs for absorption in centemeters
   double Sigma_a_t = std::stod(argv[2]);
-
+  
   // Training points
-  std::vector<double> Sigma_a_train = {0.02, 0.04, 0.08, 0.10,
-                                       0.12, 0.14, 0.16, 0.18};
-  std::vector<std::vector<double>> flux_train;
+  std::vector<double> Sigma_a_train = {0.02, 0.04, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18};
+  std::vector<std::vector<double> > flux_train;
   std::vector<double> k_train;
 
   flux_train.reserve(Sigma_a_train.size());
   k_train.reserve(Sigma_a_train.size());
 
   // Constants
-  double half_thickness = 30.0; // cm
-  double D = 2.0;               // cm
-  double nu_Sigma_f = 0.11;     // cm^-1
+  double half_thickness = 30.0;           // cm
+  double D = 2.0;                         // cm
+  double nu_Sigma_f = 0.11;               // cm^-1
+
+  // Boundaries
+  std::pair<double, double> left_bound;   // a/b left boundary condition
+  std::pair<double, double> right_bound;  // a/b right boundary condition
+  left_bound.first  = 0.0;  // a
+  left_bound.second = 1.0;  // b
+  right_bound.first = 1.0;  // a
+  left_bound.second = -2.0; // b
 
   // Iterate over each training point
   for (double &Sigma_a : Sigma_a_train) {
     // Create finite difference mesh
-    // USE MESH CONSTROCTOR HERE
-    linalg::Matrix M(N, N);
-    linalg::Matrix F(N, N);
+    // Making Mesh object and getting M, F matricies
+    Mesh my_mesh (N, half_thickness, left_bound, right_bound);
+    my_mesh.run(nu_Sigma_f, Sigma_a_t, D);
+    
+    // Initializing M, F into variable (could be done in powerIteration)
+    linalg::Matrix M = my_mesh.getF();
+    linalg::Matrix F = my_mesh.getM();
 
     // Run power iteration to solve eigenvalue problem
     auto eigen_result = linalg::powerIteration(M, F);
@@ -94,8 +104,7 @@ int main(int argc, char *argv[]) {
   double rel_err = std::abs(k_t - k_t_exact) / k_t_exact;
 
   // Print results
-  printf("For target Sigma_a = %5lg, k_t = %6lg, with %6lg relative error.",
-         Sigma_a_t, k_t, rel_err);
+  printf("For target Sigma_a = %5lg, k_t = %6lg, with %6lg relative error.", Sigma_a_t, k_t, rel_err);
 
   return 0;
 }
