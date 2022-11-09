@@ -23,7 +23,17 @@ linalg::Matrix linalg::Matrix::matmat(Matrix &mat) {
 }
 
 std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
+  // Initialize result vector
   std::vector<double> result(_size.first, 0);
+
+  // Assert cols of first mat == rows of vec
+  assert(_size.second == col_vec.size());
+
+  // For each element in _data iterate through the row of mat at element.I and col at element.J
+  for (auto& element : _data) {
+    result[element.I] += element.val * col_vec[element.J];
+  }
+
   return result;
 }
 
@@ -98,6 +108,7 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
 
 linalg::Matrix linalg::Matrix::getInverse() {
   Matrix result(_size.first, _size.second);
+ 
   return result;
 }
 
