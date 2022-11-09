@@ -2,7 +2,6 @@
 
 #include "../src/matrix.hpp"
 
-
 TEST(build_matrix_1) {
   // Initialize matrix
   linalg::Matrix mat(5, 8);
@@ -31,7 +30,7 @@ TEST(matrix_vector_1) {
   mat.set(1, 2, 1);
 
   std::vector<double> vet_correct{{1}, {-3}};
-  int correct_size = 2; 
+  int correct_size = 2;
 
   std::vector<double> vect_solution = mat.matvec(vet);
 
@@ -41,7 +40,6 @@ TEST(matrix_vector_1) {
   for (size_t i = 0; i < 2; i++) {
     ASSERT_ALMOST_EQUAL(vect_solution[i], vet_correct[i], 0.00001);
   }
-  
 }
 
 TEST(determinant_test) {
@@ -58,16 +56,13 @@ TEST(determinant_test) {
   mat.set(2, 1, 9);
   mat.set(2, 2, 8);
 
-  int correct_val = 36; 
+  int correct_val = 36;
 
-  int val_solution = mat.determinantOfMatrix(mat, 3);
+  int val_solution = mat.determinantOfMatrix();
 
   std::cout << "determinant_test val is: " << val_solution;
 
   ASSERT_ALMOST_EQUAL(val_solution, correct_val, 0.00001);
-
-  
-  
 }
 
 TEST_MAIN();

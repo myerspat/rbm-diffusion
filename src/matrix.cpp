@@ -1,8 +1,11 @@
 #include "matrix.hpp"
 #include <bits/stdc++.h>
 
-linalg::Matrix::Matrix(std::vector<size_t> &I, std::vector<size_t> &J,
-                       std::vector<double> &val, const size_t m, const size_t n)
+linalg::Matrix::Matrix(std::vector<size_t> &I,
+                       std::vector<size_t> &J,
+                       std::vector<double> &val,
+                       const size_t m,
+                       const size_t n)
     : _size(std::make_pair(m, n)) {
   // Assert the vectors are the same length
   assert(I.size() == J.size() && I.size() == val.size());
@@ -30,7 +33,7 @@ std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
   assert(_size.second == col_vec.size());
 
   // For each element in _data iterate through the row of mat at element.I and col at element.J
-  for (auto& element : _data) {
+  for (auto &element : _data) {
     result[element.I] += element.val * col_vec[element.J];
   }
 
@@ -47,13 +50,13 @@ std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
 
 void linalg::Matrix::set(size_t i, size_t j, double val) {
   // Find the iterator at i and j
-  auto it = std::find_if(_data.begin(), _data.end(),
-                         [&](const auto &a) { return i == a.I && j == a.J; });
+  auto it = std::find_if(_data.begin(), _data.end(), [&](const auto &a) { return i == a.I && j == a.J; });
 
   // If found update to new value and if not add to the end of the vector
   if (it != _data.end()) {
     it->val = val;
-  } else {
+  }
+  else {
     linalg::coo new_value;
     new_value.I = i;
     new_value.J = j;
@@ -64,8 +67,7 @@ void linalg::Matrix::set(size_t i, size_t j, double val) {
 
 double linalg::Matrix::at(size_t i, size_t j) {
   // Find position i,j
-  auto it = std::find_if(_data.cbegin(), _data.cend(),
-                         [&](const auto a) { return i == a.I && j == a.J; });
+  auto it = std::find_if(_data.cbegin(), _data.cend(), [&](const auto a) { return i == a.I && j == a.J; });
 
   // If that position exists return the value, if not return 0
   if (it != _data.cend()) {
@@ -102,7 +104,7 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
 
 linalg::Matrix linalg::Matrix::getInverse() {
   Matrix result(_size.first, _size.second);
- 
+
   return result;
 }
 
@@ -118,50 +120,53 @@ linalg::Matrix linalg::Matrix::operator*(double scalar) {
 }
 
 /// --------------------------------------------------
-//void linalg::Matrix::set(size_t i, size_t j, double val) {
-// void linalg::Matrix::subMatrix(int mat[N][N], int temp[N][N], int p, int q, int n) {
-void linalg::Matrix::subMatrix(Matrix &temp, int p, int q, int n) {
-   int i = 0, j = 0;
-   // filling the sub matrix
-   for (int row = 0; row < n; row++) {
-      for (int col = 0; col < n; col++) {
-         // skipping if the current row or column is not equal to the current
-         // element row and column
-         if (row != p && col != q) {
-            temp.set(i,j++,this->at(row,col));
-            // temp[i][j++] = mat[row][col];
-            if (j == n - 1) {
-               j = 0;
-               i++;
-            }
-         }
-      }
-   }
-}
-//double linalg::Matrix::at(size_t i, size_t j) {
-//int linalg::Matrix::determinantOfMatrix(int matrix[N][N], int n) {
-// matrix can be found with _data 
-// N = _size.first
-// n = _size.first
-double linalg::Matrix::determinantOfMatrix(Matrix &mat,int n) {
-  // Assert  matrix is square
-  assert(_size.second == _size.first );
-  //Matrix mat(_size.first, _size.second);
+// void linalg::Matrix::set(size_t i, size_t j, double val) {
+//  void linalg::Matrix::subMatrix(int mat[N][N], int temp[N][N], int p, int q, int n) {
+linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n) {
+  // Initialize temp matrix
+  Matrix temp(n, n);
 
-   double determinant = 0;
-   if (n == 1) {
-      return this->at(0,0);
-   }
-  //  if (n == 2) {
-  //     return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
-  //  }
-   //int temp[N][N];
-   int sign = 1;
-   Matrix temp(_size.first, _size.second);
-   for (int i = 0; i < n; i++) {
-      subMatrix(temp, 0, i, n);
-      determinant += sign * this->at(0,i) * determinantOfMatrix(temp, n - 1);
-      sign = -sign;
-   }
-   return determinant;
+  // For each element in the matrix
+  for (const auto &element : _data) {
+    if (element.I != p && element.J != q) {
+      // Calculate new column position to the left of q it will 
+      // remain the same to the right we must subtract one
+      // because we are removing a column
+      size_t new_col = element.J;
+      if (element.J > q)
+        new_col--;
+
+      // Set the value of the temp matrix
+      temp.set(element.I - 1, new_col, element.val);
+    }
+  }
+  return temp;
+}
+
+// double linalg::Matrix::at(size_t i, size_t j) {
+// int linalg::Matrix::determinantOfMatrix(int matrix[N][N], int n) {
+//  matrix can be found with _data
+//  N = _size.first
+//  n = _size.first
+double linalg::Matrix::determinantOfMatrix() {
+  // Assert  matrix is square
+  assert(_size.second == _size.first);
+  // Matrix mat(_size.first, _size.second);
+  int n = _size.first;
+
+  double determinant = 0;
+  if (n == 1) {
+    return this->at(0, 0);
+  }
+  else if (n == 2) {
+    return (at(0, 0) * at(1, 1)) - (at(0, 1) * at(1, 0));
+  }
+  // int temp[N][N];
+  int sign = 1;
+  for (int i = 0; i < n; i++) {
+    Matrix temp = subMatrix(0, i, n - 1);
+    determinant += sign * this->at(0, i) * temp.determinantOfMatrix();
+    sign = -sign;
+  }
+  return determinant;
 }

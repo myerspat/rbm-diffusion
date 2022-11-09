@@ -58,10 +58,10 @@ public:
   Matrix operator*(double);
 
   //  find the submatrix for determinant 
-  void subMatrix(Matrix &temp, int p, int q, int n);
+  Matrix subMatrix(int p, int q, int n);
 
   //  find the determinant 
-  double determinantOfMatrix(Matrix &temp, int n);
+  double determinantOfMatrix();
 };
 
 } // namespace linalg
