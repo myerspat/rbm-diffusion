@@ -1,9 +1,9 @@
-name: Formatting and Linting
+name: Formatting
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ develop ]
 
 jobs:
   pre-commit:
