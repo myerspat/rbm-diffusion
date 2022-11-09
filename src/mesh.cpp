@@ -60,12 +60,3 @@ void Mesh::run(double fissionXS, double absorptionXS, double D) {
     _F.set(i, i, fissionXS * dx);
   }
 }
-// --------------------------
-// Method for outside class information to access the Fission Matrix, _F.
-// --------------------------
-linalg::Matrix Mesh::getF() { return _F; }
-// --------------------------
-// Method for ouside class information to access the Migration Matrix, _M.
-linalg::Matrix Mesh::getM() { return _M; }
-
-// Mesh::~Mesh() {}
