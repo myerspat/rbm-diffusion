@@ -116,3 +116,52 @@ linalg::Matrix linalg::Matrix::operator*(double scalar) {
 
   return mat;
 }
+
+/// --------------------------------------------------
+//void linalg::Matrix::set(size_t i, size_t j, double val) {
+// void linalg::Matrix::subMatrix(int mat[N][N], int temp[N][N], int p, int q, int n) {
+void linalg::Matrix::subMatrix(Matrix &temp, int p, int q, int n) {
+   int i = 0, j = 0;
+   // filling the sub matrix
+   for (int row = 0; row < n; row++) {
+      for (int col = 0; col < n; col++) {
+         // skipping if the current row or column is not equal to the current
+         // element row and column
+         if (row != p && col != q) {
+            temp.set(i,j++,this->at(row,col));
+            // temp[i][j++] = mat[row][col];
+            if (j == n - 1) {
+               j = 0;
+               i++;
+            }
+         }
+      }
+   }
+}
+//double linalg::Matrix::at(size_t i, size_t j) {
+//int linalg::Matrix::determinantOfMatrix(int matrix[N][N], int n) {
+// matrix can be found with _data 
+// N = _size.first
+// n = _size.first
+double linalg::Matrix::determinantOfMatrix(Matrix &mat,int n) {
+  // Assert  matrix is square
+  assert(_size.second == _size.first );
+  //Matrix mat(_size.first, _size.second);
+
+   double determinant = 0;
+   if (n == 1) {
+      return this->at(0,0);
+   }
+  //  if (n == 2) {
+  //     return (matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]);
+  //  }
+   //int temp[N][N];
+   int sign = 1;
+   Matrix temp(_size.first, _size.second);
+   for (int i = 0; i < n; i++) {
+      subMatrix(temp, 0, i, n);
+      determinant += sign * this->at(0,i) * determinantOfMatrix(temp, n - 1);
+      sign = -sign;
+   }
+   return determinant;
+}

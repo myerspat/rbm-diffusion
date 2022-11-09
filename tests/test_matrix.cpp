@@ -44,4 +44,30 @@ TEST(matrix_vector_1) {
   
 }
 
+TEST(determinant_test) {
+  // Initialize matrix
+  linalg::Matrix mat(3, 3);
+
+  mat.set(0, 0, 2);
+  mat.set(0, 1, 1);
+  mat.set(0, 2, 3);
+  mat.set(1, 0, 6);
+  mat.set(1, 1, 5);
+  mat.set(1, 2, 7);
+  mat.set(2, 0, 4);
+  mat.set(2, 1, 9);
+  mat.set(2, 2, 8);
+
+  int correct_val = 36; 
+
+  int val_solution = mat.determinantOfMatrix(mat, 3);
+
+  std::cout << "determinant_test val is: " << val_solution;
+
+  ASSERT_ALMOST_EQUAL(val_solution, correct_val, 0.00001);
+
+  
+  
+}
+
 TEST_MAIN();
