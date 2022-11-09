@@ -41,4 +41,5 @@ TEST(power_iteration) {
   ASSERT_ALMOST_EQUAL(solution.second, correct_k, 0.00001);
 }
 
+
 TEST_MAIN();
