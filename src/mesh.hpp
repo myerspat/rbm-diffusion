@@ -28,8 +28,8 @@ class Mesh {
       _distance = distance;
       // asserting a and b are both not equal to zero for both boundary conditions
       // This is not possible (I think)
-      // assert(!(left_bound.first == 0.0 && left_bound.second == 0.0));
-      // assert(!(right_bound.first == 0.0 && right_bound.second == 0.0));
+      assert(!(left_bound.first == 0.0 && left_bound.second == 0.0));
+      assert(!(right_bound.first == 0.0 && right_bound.second == 0.0));
       _left_bound = left_bound;
       _right_bound = right_bound;
       linalg::Matrix mat(_N, _N);

@@ -8,9 +8,7 @@ void Mesh::run(double fissionXS, double absorptionXS, double D) {
   // Stores a/b in a pair (a,b)
   // -------------------------
   //
-  assert(_left_bound.first != 0.0 || _right_bound.second != 0.0);
-  double rL, rR, Do, Di, Dn;
-  bool Do_flag, Dn_flag;
+  double Do, Di, Dn;
   double dx = _distance / static_cast<double>(_N);
   // Left boundary conditions: branch statements setting Do tilda
   // If a=0  b!= 0  then we get 1/ (0/1) = inf so Do = 0
