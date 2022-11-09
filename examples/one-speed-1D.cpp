@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   left_bound.first = 0.0;                // a
   left_bound.second = 1.0;               // b
   right_bound.first = 1.0;               // a
-  left_bound.second = -2.0;              // b
+  right_bound.second = -2.0;              // b
 
   // Iterate over each training point
   for (double &Sigma_a : Sigma_a_train) {
