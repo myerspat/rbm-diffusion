@@ -1,0 +1,3 @@
+[submodule "vendor/xtensor"]
+	path = vendor/xtensor
+	url = https://github.com/xtensor-stack/xtensor.git
