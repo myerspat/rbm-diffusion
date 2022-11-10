@@ -144,7 +144,7 @@ linalg::Matrix linalg::Matrix::getInverse() {
   double determinant = 0;
   determinant = this->determinantOfMatrix();
   if(determinant == 0){
-    throw std::runtime_error("Matrix not invertable"); 
+    throw std::runtime_error("Matrix is not invertable"); 
   }
 
   Matrix ADJ = this->adjoint();
@@ -228,7 +228,6 @@ linalg::Matrix linalg::Matrix::adjoint() {
       Matrix temp = subMatrix(i, j, n-1);
       sign = ((i + j) % 2 == 0) ? 1 : -1;
       ADJ.set(j,i, (sign) * temp.determinantOfMatrix());
-      printf("%d %d\n", (int)i, (int)j);
     }
   }  
   return ADJ;
