@@ -44,8 +44,7 @@ TEST(test_matmat_multiply) {
   linalg::Matrix mat1(I, J, vals1, 3, 3);
   linalg::Matrix mat2(I, J, vals2, 3, 3);
 
-  double correct_mat[3][3] = {
-      {49.42, 57.57, 43.32}, {84.61, 116.14, 100.70}, {20.48, 57.84, 52.77}};
+  double correct_mat[3][3] = {{49.42, 57.57, 43.32}, {84.61, 116.14, 100.70}, {20.48, 57.84, 52.77}};
 
   linalg::Matrix result = mat1.matmat(mat2);
 
@@ -66,8 +65,7 @@ TEST(test_sparse_matmat_multiply) {
   linalg::Matrix mat1(I, J, vals1, 3, 3);
   linalg::Matrix mat2(I, J, vals2, 3, 3);
 
-  double correct_mat[3][3] = {
-      {0.0, 0.0, 18.6}, {67.45, 76.95, 53.90}, {0.0, 0.0, 21}};
+  double correct_mat[3][3] = {{0.0, 0.0, 18.6}, {67.45, 76.95, 53.90}, {0.0, 0.0, 21}};
 
   linalg::Matrix result = mat1.matmat(mat2);
 
@@ -181,7 +179,6 @@ TEST(adjoint_test) {
   ASSERT_EQUAL(mat_solution.at(3, 1), mat_correct.at(3, 1));
   ASSERT_EQUAL(mat_solution.at(3, 2), mat_correct.at(3, 2));
   ASSERT_EQUAL(mat_solution.at(3, 3), mat_correct.at(3, 3));
-
 }
 
 TEST(inverse_test) {
@@ -262,10 +259,9 @@ TEST(vector_matrix_1) {
   mat.set(2, 3, 3);
 
   std::vector<double> vet_correct{83, 63, 37, 75};
-  int correct_size = 4; 
+  int correct_size = 4;
 
-  std::vector<double> vect_solution = mat.vecmat(vet) ;
-
+  std::vector<double> vect_solution = mat.vecmat(vet);
 
   ASSERT_EQUAL(vect_solution.size(), correct_size);
 

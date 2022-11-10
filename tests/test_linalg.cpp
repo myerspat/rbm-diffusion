@@ -27,8 +27,7 @@ TEST(power_iteration) {
   }
 
   // Run power iteration
-  std::pair<std::vector<double>, double> solution =
-      linalg::powerIteration(M, F);
+  std::pair<std::vector<double>, double> solution = linalg::powerIteration(M, F);
 
   // Expected results
   double correct_flux[5] = {1.37616, 1.27097, 1.06864, 0.78462, 0.44062};
