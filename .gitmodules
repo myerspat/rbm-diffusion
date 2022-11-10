@@ -1,3 +1,6 @@
 [submodule "vendor/xtensor"]
 	path = vendor/xtensor
 	url = git@github.com:xtensor-stack/xtensor.git
+[submodule "vendor/xtl"]
+	path = vendor/xtl
+	url = git@github.com:xtensor-stack/xtl.git

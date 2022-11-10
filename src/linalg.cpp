@@ -1,4 +1,4 @@
-#include "linalg.hpp"
+#include "rbm/linalg.hpp"
 #include <algorithm>
 #include <assert.h>
 #include <cmath>

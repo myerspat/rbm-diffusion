@@ -1,5 +1,4 @@
-#include "../src/mesh.cpp"
-#include "../src/mesh.hpp"
+#include "rbm/mesh.hpp"
 #include "unit_test_framework.hpp"
 
 TEST(build_mesh) {

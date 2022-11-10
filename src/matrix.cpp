@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "rbm/matrix.hpp"
 #include <bits/stdc++.h>
 #include <stdexcept>
 
