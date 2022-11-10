@@ -1,6 +1,5 @@
 # rbm-diffusion
 [![Build Status](https://github.com/myerspat/rbm-diffusion/actions/workflows/cmake.yml/badge.svg)](https://github.com/myerspat/rbm-diffusion/actions/workflows)
-![Formatting](https://github.com/myerspat/rbm-diffusion/actions/workflows/formatting.yaml/badge.svg)
 
 Reduced basis modeling of the neutron diffusion equation using finite difference.
 
