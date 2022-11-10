@@ -49,12 +49,12 @@ class Mesh {
     //------------
     // returns the Fission Matrix
     //----------------
-    linalg::Matrix getF(){return _F;}
+    linalg::Matrix getF() { return _F; }
 
     //------------------
     // Returns the Migration Matrix
     // --------------------
-    linalg::Matrix getM(){return _M;};
+    linalg::Matrix getM() { return _M; };
 };
 
 #endif // !_MESH_
