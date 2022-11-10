@@ -36,7 +36,7 @@ TEST(power_iteration) {
 
   // Assertions
   for (size_t i = 0; i < 5; i++) {
-    ASSERT_ALMOST_EQUAL(solution.first[i], correct_flux[i], 0.00001);
+    ASSERT_ALMOST_EQUAL(solution.first[i], correct_flux[i], 0.0001);
   }
   ASSERT_ALMOST_EQUAL(solution.second, correct_k, 0.00001);
 }
