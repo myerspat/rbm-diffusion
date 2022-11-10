@@ -27,8 +27,7 @@ TEST(power_iteration) {
   }
 
   // Run power iteration
-  std::pair<std::vector<double>, double> solution =
-      linalg::powerIteration(M, F);
+  std::pair<std::vector<double>, double> solution = linalg::powerIteration(M, F);
 
   // Expected results
   double correct_flux[5] = {1.37616, 1.27097, 1.06864, 0.78462, 0.44062};
@@ -36,7 +35,7 @@ TEST(power_iteration) {
 
   // Assertions
   for (size_t i = 0; i < 5; i++) {
-    ASSERT_ALMOST_EQUAL(solution.first[i], correct_flux[i], 0.00001);
+    ASSERT_ALMOST_EQUAL(solution.first[i], correct_flux[i], 0.0001);
   }
   ASSERT_ALMOST_EQUAL(solution.second, correct_k, 0.00001);
 }

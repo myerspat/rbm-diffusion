@@ -1,7 +1,12 @@
-add_executable(examples
-  one-speed-1D.cpp
+# Set example files
+set(EXAMPLES
+  one-speed-1D
 )
 
-target_include_directories(examples PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/../src/
-)
+set(LIBRARY_NAME cpplib)
+
+foreach(example ${EXAMPLES})
+  set(example_name ${example})
+  add_executable(${example_name} ${example}.cpp)
+  target_link_libraries(${example_name} cpplib)
+endforeach()
