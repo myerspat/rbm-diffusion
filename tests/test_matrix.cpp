@@ -1,6 +1,6 @@
 #include "unit_test_framework.hpp"
 
-#include "../src/matrix.hpp"
+#include "rbm/matrix.hpp"
 #include <cstdio>
 
 TEST(build_matrix_1) {

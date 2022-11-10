@@ -1,5 +1,5 @@
-#include "./mesh.hpp"
-#include "matrix.hpp"
+#include "rbm/mesh.hpp"
+#include "rbm/matrix.hpp"
 #include <bits/stdc++.h>
 
 void Mesh::run(double fissionXS, double absorptionXS, double D) {
@@ -16,21 +16,17 @@ void Mesh::run(double fissionXS, double absorptionXS, double D) {
   // else we do normal conditions
   if (_left_bound.first == 0.0) {
     Do = 0;
-  }
-  else if (_left_bound.second == 0.0) {
+  } else if (_left_bound.second == 0.0) {
     Do = 1.0 / (dx / (2.0 * D));
-  }
-  else {
+  } else {
     Do = 1 / (dx / (2.0 * D) - _left_bound.second / _left_bound.first);
   }
   // Right boundary conditions: branch statements
   if (_right_bound.first == 0.0) {
     Dn = 0; // This term is 1 / r
-  }
-  else if (_right_bound.second == 0.0) {
+  } else if (_right_bound.second == 0.0) {
     Dn = 1 / (dx / (2 * D));
-  }
-  else {
+  } else {
     Dn = 1 / (dx / (2 * D) - _right_bound.second / _right_bound.first);
   }
   // For loop iterating of mesh elements
@@ -42,14 +38,12 @@ void Mesh::run(double fissionXS, double absorptionXS, double D) {
       _M.set(i, i + 1, -1.0 / (dx / (2.0 * D) + dx / (2.0 * D)));
       _M.set(i, i, absorptionXS * dx + Do - _M.at(i, i + 1));
       // right boundary case
-    }
-    else if (i == (_N - 1)) {
+    } else if (i == (_N - 1)) {
       Di = 1.0 / (dx / (2.0 * D) + dx / (2.0 * D));
       _M.set(i, i - 1, -Di);
       _M.set(i, i, absorptionXS * dx + Dn - _M.at(i, i - 1));
       // General Case
-    }
-    else {
+    } else {
       _M.set(i, i + 1, -1.0 / (dx / (2.0 * D) + dx / (2.0 * D)));
       _M.set(i, i - 1, -1.0 / (dx / (2.0 * D) + dx / (2.0 * D)));
       _M.set(i, i, absorptionXS * dx - _M.at(i, i - 1) - _M.at(i, i + 1));

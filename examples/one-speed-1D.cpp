@@ -1,6 +1,6 @@
-#include "../src/linalg.hpp"
-#include "../src/matrix.hpp"
-#include "../src/mesh.hpp"
+#include "rbm/linalg.hpp"
+#include "rbm/matrix.hpp"
+#include "rbm/mesh.hpp"
 
 #include <cmath>
 #include <cstdio>

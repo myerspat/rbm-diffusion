@@ -1,5 +1,5 @@
-#include "../src/linalg.hpp"
-#include "../src/matrix.hpp"
+#include "rbm/linalg.hpp"
+#include "rbm/matrix.hpp"
 #include "unit_test_framework.hpp"
 
 TEST(power_iteration) {

@@ -2,18 +2,49 @@
 cmake_minimum_required(VERSION 3.10.0)
 
 # Project name
-project(rbm-diffusion VERSION 0.1.0)
+project(rbm VERSION 0.1.0)
 
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(LIBRARY_NAME cpplib)
+option(RBM_ENABLE_PROFILE "Compile with profiling flags" OFF)
+option(RBM_OPTIMIZED      "Compile with optimization"    OFF)
+
+if(RBM_ENABLE_PROFILE)
+  list(APPEND flags -g -fno-omit-frame-pointer)
+endif()
+
+if(RBM_OPTIMIZED)
+  list(APPEND flags -O3 -march=native)
+endif()
+
+# Show flags being used
+message(STATUS "RBM C++ flags: ${flags}")
+
+# Source files
+list(APPEND rbmlib_SOURCES
+  src/matrix.cpp
+  src/linalg.cpp
+  src/mesh.cpp
+)
+
+
+include_directories(include)
+
+add_library(rbmlib SHARED ${rbmlib_SOURCES})
+
+target_compile_options(rbmlib PRIVATE ${flags})
+
+# xtensor header-only library
+add_subdirectory(vendor/xtl)
+set(xtl_DIR ${CMAKE_CURRENT_BINARY_DIR}/vendor/xtl)
+add_subdirectory(vendor/xtensor)
+
+target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/include)
+target_link_libraries(rbmlib xtensor)
 
 include(CTest)
-include_directories(src)
-
-add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(examples)
 

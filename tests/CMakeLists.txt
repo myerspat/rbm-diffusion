@@ -10,11 +10,9 @@ set(SOURCE_FILES
   test_mesh.cpp
 )
 
-set(LIBRARY_NAME cpplib)
-
 foreach(test ${SOURCE_FILES})
   set(test_name ${test}_ctest)
   add_executable(${test_name} ${test})
-  target_link_libraries(${test_name} cpplib)
+  target_link_libraries(${test_name} rbmlib)
   add_test(${test_name} ${test_name})
 endforeach()
