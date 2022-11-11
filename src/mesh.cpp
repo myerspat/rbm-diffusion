@@ -1,5 +1,4 @@
 #include "rbm/mesh.hpp"
-#include "rbm/matrix.hpp"
 #include <bits/stdc++.h>
 
 void Mesh::run(double fissionXS, double absorptionXS, double D)

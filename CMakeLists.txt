@@ -24,9 +24,13 @@ message(STATUS "RBM C++ flags: ${flags}")
 
 # Source files
 list(APPEND rbmlib_SOURCES
-  src/matrix.cpp
-  src/linalg.cpp
   src/mesh.cpp
+)
+
+# Archived source files
+list(APPEND rbmlib_SOURCES
+  src/archive/matrix.cpp
+  src/archive/linalg.cpp
 )
 
 include_directories(include)
@@ -42,14 +46,14 @@ add_subdirectory(vendor/xtensor)
 add_subdirectory(vendor/xtensor-blas)
 
 # OpenBLAS
-set(BLAS_VENDER OpenBLAS)
-set(BLAS_LIBRARIES ${CMAKE_BINARY_DIR}/opt/OpenBLAS/lib/libopenblas.so)
-find_package(BLAS REQUIRED)
-if(BLAS_FOUND)
-  message("-- OpenBLAS found: ${BLAS_LIBRARIES}")
-  target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/opt/OpenBLAS/include/)
-endif(BLAS_FOUND)
+# set(BLA_VENDER OpenBLAS)
+# find_package(BLAS REQUIRED)
+# if(BLAS_FOUND)
+#   message("-- OpenBLAS found: ${BLAS_LIBRARIES}")
+#   target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/opt/OpenBLAS/include/)
+# endif(BLAS_FOUND)
 
+target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/opt/OpenBLAS/include/)
 
 target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/include)
 target_link_libraries(rbmlib xtensor xtensor-blas /opt/OpenBLAS/lib/libopenblas.so)
