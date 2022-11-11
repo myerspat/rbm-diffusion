@@ -1,8 +1,9 @@
-#include "rbm/linalg.hpp"
-#include "rbm/matrix.hpp"
+#include "rbm/archive/linalg.hpp"
+#include "rbm/archive/matrix.hpp"
 #include "unit_test_framework.hpp"
 
-TEST(power_iteration) {
+TEST(power_iteration)
+{
   linalg::Matrix M(5, 5);
   linalg::Matrix F(5, 5);
 
@@ -27,7 +28,8 @@ TEST(power_iteration) {
   }
 
   // Run power iteration
-  std::pair<std::vector<double>, double> solution = linalg::powerIteration(M, F);
+  std::pair<std::vector<double>, double> solution =
+    linalg::powerIteration(M, F);
 
   // Expected results
   double correct_flux[5] = {1.37616, 1.27097, 1.06864, 0.78462, 0.44062};

@@ -1,13 +1,11 @@
-#include "rbm/matrix.hpp"
+#include "rbm/archive/matrix.hpp"
 #include <bits/stdc++.h>
 #include <stdexcept>
 
-linalg::Matrix::Matrix(std::vector<size_t> &I,
-                       std::vector<size_t> &J,
-                       std::vector<double> &val,
-                       const size_t m,
-                       const size_t n)
-    : _size(std::make_pair(m, n)) {
+linalg::Matrix::Matrix(std::vector<size_t>& I, std::vector<size_t>& J,
+  std::vector<double>& val, const size_t m, const size_t n)
+  : _size(std::make_pair(m, n))
+{
   // Assert the vectors are the same length
   assert(I.size() == J.size() && I.size() == val.size());
 
@@ -22,7 +20,8 @@ linalg::Matrix::Matrix(std::vector<size_t> &I,
   }
 }
 
-linalg::Matrix linalg::Matrix::matmat(Matrix &mat) {
+linalg::Matrix linalg::Matrix::matmat(Matrix& mat)
+{
   // Assert rows of first mat == cols of second mat
   assert(_size.first == mat.size().second);
 
@@ -30,9 +29,10 @@ linalg::Matrix linalg::Matrix::matmat(Matrix &mat) {
   linalg::Matrix result(_size.first, mat.size().second);
 
   // For each element in _data iterate through the row of mat at element.I
-  for (linalg::coo &element : _data) {
+  for (linalg::coo& element : _data) {
     for (size_t j = 0; j < result.size().second; j++) {
-      double new_val = result.at(element.I, j) + mat.at(element.J, j) * element.val;
+      double new_val =
+        result.at(element.I, j) + mat.at(element.J, j) * element.val;
       result.set(element.I, j, new_val);
     }
   }
@@ -40,52 +40,56 @@ linalg::Matrix linalg::Matrix::matmat(Matrix &mat) {
   return result;
 }
 
-std::vector<double> linalg::Matrix::matvec(const std::vector<double> &col_vec) {
+std::vector<double> linalg::Matrix::matvec(const std::vector<double>& col_vec)
+{
   // Initialize result vector
   std::vector<double> result(_size.first, 0);
 
   // Assert cols of first mat == rows of vec
   assert(_size.second == col_vec.size());
 
-  // For each element in _data iterate through the row of mat at element.I and col at element.J
-  for (auto &element : _data) {
+  // For each element in _data iterate through the row of mat at element.I and
+  // col at element.J
+  for (auto& element : _data) {
     result[element.I] += element.val * col_vec[element.J];
   }
 
   return result;
 }
 
-std::vector<double> linalg::Matrix::vecmat(const std::vector<double> &row_vec) {
+std::vector<double> linalg::Matrix::vecmat(const std::vector<double>& row_vec)
+{
   std::vector<double> result(_size.second, 0);
 
   // Assert rows of  mat == cols of vec
   assert(_size.first == row_vec.size());
 
-  // For each element in _data iterate through the row of mat at element.I and col at element.J
-  for (auto &element : _data) {
+  // For each element in _data iterate through the row of mat at element.I and
+  // col at element.J
+  for (auto& element : _data) {
     result[element.J] += row_vec[element.I] * element.val;
   }
 
   return result;
 }
 
-void linalg::Matrix::set(size_t i, size_t j, double val) {
+void linalg::Matrix::set(size_t i, size_t j, double val)
+{
   // Assert the indicies are within the matrix bounds
   assert(i < _size.first && j < _size.second);
 
   // Find the iterator at i and j
-  auto it = std::find_if(_data.begin(), _data.end(), [&](const auto &a) { return i == a.I && j == a.J; });
+  auto it = std::find_if(_data.begin(), _data.end(),
+    [&](const auto& a) { return i == a.I && j == a.J; });
 
   // If found update to new value and if not add to the end of the vector
   if (it != _data.end()) {
     if (val == 0) {
       _data.erase(it);
-    }
-    else {
+    } else {
       it->val = val;
     }
-  }
-  else if (val != 0) {
+  } else if (val != 0) {
     linalg::coo new_value;
     new_value.I = i;
     new_value.J = j;
@@ -94,12 +98,14 @@ void linalg::Matrix::set(size_t i, size_t j, double val) {
   }
 }
 
-double linalg::Matrix::at(size_t i, size_t j) {
+double linalg::Matrix::at(size_t i, size_t j)
+{
   // Assert the indicies are within the matrix bounds
   assert(i < _size.first && j < _size.second);
 
   // Find position i,j
-  auto it = std::find_if(_data.cbegin(), _data.cend(), [&](const auto a) { return i == a.I && j == a.J; });
+  auto it = std::find_if(_data.cbegin(), _data.cend(),
+    [&](const auto a) { return i == a.I && j == a.J; });
 
   // If that position exists return the value, if not return 0
   if (it != _data.cend()) {
@@ -108,7 +114,8 @@ double linalg::Matrix::at(size_t i, size_t j) {
   return 0.0;
 }
 
-std::vector<double> linalg::Matrix::getRow(const size_t i) {
+std::vector<double> linalg::Matrix::getRow(const size_t i)
+{
   // Assert the indicies are within the matrix bounds
   assert(i < _size.first);
 
@@ -124,7 +131,8 @@ std::vector<double> linalg::Matrix::getRow(const size_t i) {
   return row;
 }
 
-std::vector<double> linalg::Matrix::getColumn(const size_t j) {
+std::vector<double> linalg::Matrix::getColumn(const size_t j)
+{
   // Assert the indicies are within the matrix bounds
   assert(j < _size.second);
 
@@ -140,7 +148,8 @@ std::vector<double> linalg::Matrix::getColumn(const size_t j) {
   return col;
 }
 
-linalg::Matrix linalg::Matrix::getInverse() {
+linalg::Matrix linalg::Matrix::getInverse()
+{
   // Calculate the determinant of the matrix
   double determinant = 0;
   determinant = this->determinantOfMatrix();
@@ -154,7 +163,8 @@ linalg::Matrix linalg::Matrix::getInverse() {
   return ADJ * (1 / determinant);
 }
 
-linalg::Matrix linalg::Matrix::operator*(double scalar) {
+linalg::Matrix linalg::Matrix::operator*(double scalar)
+{
   Matrix mat(_size.first, _size.second);
 
   // Multiply each element by the scalar
@@ -165,12 +175,13 @@ linalg::Matrix linalg::Matrix::operator*(double scalar) {
   return mat;
 }
 
-linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n) {
+linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n)
+{
   // Initialize temp matrix
   Matrix temp(n, n);
 
   // For each element in the matrix
-  for (const auto &element : _data) {
+  for (const auto& element : _data) {
     if (element.I != p && element.J != q) {
       // Calculate the new column and row position relative to p and q
       size_t new_row = element.I;
@@ -187,7 +198,8 @@ linalg::Matrix linalg::Matrix::subMatrix(int p, int q, int n) {
   return temp;
 }
 
-double linalg::Matrix::determinantOfMatrix() {
+double linalg::Matrix::determinantOfMatrix()
+{
   // Assert  matrix is square
   assert(_size.second == _size.first);
 
@@ -198,8 +210,7 @@ double linalg::Matrix::determinantOfMatrix() {
   double determinant = 0;
   if (n == 1) {
     return this->at(0, 0);
-  }
-  else if (n == 2) {
+  } else if (n == 2) {
     return (at(0, 0) * at(1, 1)) - (at(0, 1) * at(1, 0));
   }
 
@@ -218,7 +229,8 @@ double linalg::Matrix::determinantOfMatrix() {
   return determinant;
 }
 
-linalg::Matrix linalg::Matrix::adjoint() {
+linalg::Matrix linalg::Matrix::adjoint()
+{
   // Initialize temp matrix
   Matrix ADJ(_size.first, _size.second);
 

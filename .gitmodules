@@ -4,3 +4,6 @@
 [submodule "vendor/xtl"]
 	path = vendor/xtl
 	url = git@github.com:xtensor-stack/xtl.git
+[submodule "vendor/xtensor-blas"]
+	path = vendor/xtensor-blas
+	url = git@github.com:xtensor-stack/xtensor-blas.git

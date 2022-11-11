@@ -1,9 +1,10 @@
 #include "unit_test_framework.hpp"
 
-#include "rbm/matrix.hpp"
+#include "rbm/archive/matrix.hpp"
 #include <cstdio>
 
-TEST(build_matrix_1) {
+TEST(build_matrix_1)
+{
   // Initialize matrix
   linalg::Matrix mat(5, 8);
 
@@ -18,7 +19,8 @@ TEST(build_matrix_1) {
   ASSERT_EQUAL(mat.size().second, 8);
 }
 
-TEST(matrix_vector_based_constructor) {
+TEST(matrix_vector_based_constructor)
+{
   std::vector<size_t> I = {0, 0, 0, 1, 1, 1, 2, 2, 2};
   std::vector<size_t> J = {0, 1, 2, 0, 1, 2, 0, 1, 2};
   std::vector<double> vals = {1.2, 3.1, 6.0, 5.5, 7.8, 9.5, 6.3, 3.5, 1.8};
@@ -34,7 +36,8 @@ TEST(matrix_vector_based_constructor) {
   }
 }
 
-TEST(test_matmat_multiply) {
+TEST(test_matmat_multiply)
+{
   // Initialize two 3x3 matricies
   std::vector<size_t> I = {0, 0, 0, 1, 1, 1, 2, 2, 2};
   std::vector<size_t> J = {0, 1, 2, 0, 1, 2, 0, 1, 2};
@@ -44,7 +47,8 @@ TEST(test_matmat_multiply) {
   linalg::Matrix mat1(I, J, vals1, 3, 3);
   linalg::Matrix mat2(I, J, vals2, 3, 3);
 
-  double correct_mat[3][3] = {{49.42, 57.57, 43.32}, {84.61, 116.14, 100.70}, {20.48, 57.84, 52.77}};
+  double correct_mat[3][3] = {
+    {49.42, 57.57, 43.32}, {84.61, 116.14, 100.70}, {20.48, 57.84, 52.77}};
 
   linalg::Matrix result = mat1.matmat(mat2);
 
@@ -55,7 +59,8 @@ TEST(test_matmat_multiply) {
   }
 }
 
-TEST(test_sparse_matmat_multiply) {
+TEST(test_sparse_matmat_multiply)
+{
   // Initialize two 3x3 matricies
   std::vector<size_t> I = {0, 0, 0, 1, 1, 1, 2, 2, 2};
   std::vector<size_t> J = {0, 1, 2, 0, 1, 2, 0, 1, 2};
@@ -65,7 +70,8 @@ TEST(test_sparse_matmat_multiply) {
   linalg::Matrix mat1(I, J, vals1, 3, 3);
   linalg::Matrix mat2(I, J, vals2, 3, 3);
 
-  double correct_mat[3][3] = {{0.0, 0.0, 18.6}, {67.45, 76.95, 53.90}, {0.0, 0.0, 21}};
+  double correct_mat[3][3] = {
+    {0.0, 0.0, 18.6}, {67.45, 76.95, 53.90}, {0.0, 0.0, 21}};
 
   linalg::Matrix result = mat1.matmat(mat2);
 
@@ -76,10 +82,11 @@ TEST(test_sparse_matmat_multiply) {
   }
 }
 
-TEST(matrix_vector_1) {
+TEST(matrix_vector_1)
+{
   // Initialize matrix
   linalg::Matrix mat(2, 3);
-  std::vector<double> vet{{2}, {1}, {0}};
+  std::vector<double> vet {{2}, {1}, {0}};
 
   mat.set(0, 0, 1);
   mat.set(0, 1, -1);
@@ -88,7 +95,7 @@ TEST(matrix_vector_1) {
   mat.set(1, 1, -3);
   mat.set(1, 2, 1);
 
-  std::vector<double> vet_correct{{1}, {-3}};
+  std::vector<double> vet_correct {{1}, {-3}};
   int correct_size = 2;
 
   std::vector<double> vect_solution = mat.matvec(vet);
@@ -101,7 +108,8 @@ TEST(matrix_vector_1) {
   }
 }
 
-TEST(determinant_test) {
+TEST(determinant_test)
+{
   // Initialize matrix
   linalg::Matrix mat(3, 3);
 
@@ -122,7 +130,8 @@ TEST(determinant_test) {
   ASSERT_ALMOST_EQUAL(val_solution, correct_val, 0.00001);
 }
 
-TEST(adjoint_test) {
+TEST(adjoint_test)
+{
   // Initialize matrix
   linalg::Matrix mat(4, 4);
 
@@ -181,7 +190,8 @@ TEST(adjoint_test) {
   ASSERT_EQUAL(mat_solution.at(3, 3), mat_correct.at(3, 3));
 }
 
-TEST(inverse_test) {
+TEST(inverse_test)
+{
   // Initialize matrix
   linalg::Matrix mat(4, 4);
 
@@ -240,10 +250,11 @@ TEST(inverse_test) {
   ASSERT_ALMOST_EQUAL(mat_solution.at(3, 3), mat_correct.at(3, 3), 0.00001);
 }
 
-TEST(vector_matrix_1) {
+TEST(vector_matrix_1)
+{
   // Initialize matrix
   linalg::Matrix mat(3, 4);
-  std::vector<double> vet{3, 4, 2};
+  std::vector<double> vet {3, 4, 2};
 
   mat.set(0, 0, 13);
   mat.set(0, 1, 9);
@@ -258,7 +269,7 @@ TEST(vector_matrix_1) {
   mat.set(2, 2, 0);
   mat.set(2, 3, 3);
 
-  std::vector<double> vet_correct{83, 63, 37, 75};
+  std::vector<double> vet_correct {83, 63, 37, 75};
   int correct_size = 4;
 
   std::vector<double> vect_solution = mat.vecmat(vet);
