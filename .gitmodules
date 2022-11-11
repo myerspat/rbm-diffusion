@@ -7,9 +7,3 @@
 [submodule "vendor/xtensor-blas"]
 	path = vendor/xtensor-blas
 	url = git@github.com:xtensor-stack/xtensor-blas.git
-[submodule "vendor/OpenBLAS"]
-	path = vendor/OpenBLAS
-	url = git@github.com:xianyi/OpenBLAS.git
-[submodule "vendor/openblas-src"]
-	path = vendor/openblas-src
-	url = git@github.com:blas-lapack-rs/openblas-src.git
