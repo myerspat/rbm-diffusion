@@ -10,7 +10,7 @@ RBM uses three submodules: [xtensor](https://github.com/xtensor-stack/xtensor), 
 ...clone OpenBLAS repo
 $ git clone git@github.com:xianyi/OpenBLAS.git
 ...compile
-$ make
+$ cd OpenBLAS && make
 ...install locally
 $ make install
 ```
