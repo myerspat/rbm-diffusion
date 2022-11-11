@@ -8,7 +8,7 @@ Reduced basis modeling of the neutron diffusion equation using finite difference
 RBM uses three submodules: [xtensor](https://github.com/xtensor-stack/xtensor), [xtensor-blas](https://github.com/xtensor-stack/xtensor-blas), and [xtl](https://github.com/xtensor-stack/xtl). Xtensor-blas uses [OpenBLAS](https://github.com/xianyi/OpenBLAS) and is required for RBM. Running the following commands should install OpenBLAS locally using git:
 ```console
 ...clone OpenBLAS repo
-$ git@github.com:xianyi/OpenBLAS.git
+$ git clone git@github.com:xianyi/OpenBLAS.git
 ...compile
 $ make
 ...install locally
