@@ -29,7 +29,6 @@ list(APPEND rbmlib_SOURCES
   src/mesh.cpp
 )
 
-
 include_directories(include)
 
 add_library(rbmlib SHARED ${rbmlib_SOURCES})
@@ -40,9 +39,20 @@ target_compile_options(rbmlib PRIVATE ${flags})
 add_subdirectory(vendor/xtl)
 set(xtl_DIR ${CMAKE_CURRENT_BINARY_DIR}/vendor/xtl)
 add_subdirectory(vendor/xtensor)
+add_subdirectory(vendor/xtensor-blas)
+
+# OpenBLAS
+set(BLAS_VENDER OpenBLAS)
+set(BLAS_LIBRARIES ${CMAKE_BINARY_DIR}/opt/OpenBLAS/lib/libopenblas.so)
+find_package(BLAS REQUIRED)
+if(BLAS_FOUND)
+  message("-- OpenBLAS found: ${BLAS_LIBRARIES}")
+  target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/opt/OpenBLAS/include/)
+endif(BLAS_FOUND)
+
 
 target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/include)
-target_link_libraries(rbmlib xtensor)
+target_link_libraries(rbmlib xtensor xtensor-blas /opt/OpenBLAS/lib/libopenblas.so)
 
 include(CTest)
 add_subdirectory(tests)
