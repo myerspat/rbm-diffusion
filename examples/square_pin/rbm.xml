@@ -1,27 +1,24 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 
 <rbm>
-  <settings>
-    <convergence flux_tolerance="1e-6" k_tolerance="1e-7" max_iterations="50000"/>
-  </settings>
-
   <materials>
     <material name="fuel" absorption="0.10" D="2.0" nu_fission="0.11"/>
     <material name="reflector" absorption="0.01" D="1.5" nu_fission="0.0"/>
   </materials>
 
   <sections>
-    <section name="rectangle_1" x0="0.0" y0="0.0" l1="30.0" l2="30.0"/>
-    <section name="rectangle_2" x0="0.0" y0="30.0" l1="40.0" l2="10.0"/>
-    <section name="rectangle_3" x0="30.0" y0="0.0" l1="10.0" l2="30.0"/>
+    <section id="1" x0="0.0" y0="0.0" l1="30.0" l2="30.0"/>
+    <section id="2" x0="0.0" y0="30.0" l1="30.0" l2="10.0"/>
+    <section id="3" x0="30.0" y0="0.0" l1="10.0" l2="30.0"/>
+    <section id="4" x0="30.0" y0="30.0" l1="10.0" l2="10.0"/>
   </sections>
 
   <cells>
-    <cell name="core" material="fuel">
-      <surfaces>rectangle_1</surfaces>
+    <cell id="1" material="fuel">
+      <sections>1</sections>
     </cell>
-    <cell name="reflector" material="reflector">
-      <surfaces>rectangle_2 & rectangle_3</surfaces>
+    <cell id="2" material="reflector">
+      <sections>2 3 4</sections>
     </cell>
   </cells>
 
@@ -36,10 +33,10 @@
 
   <mesh>
     <cartesian_mesh name="square_pin" elements="22500">
-      <x section="rectangle_1" bins="75"/>
-      <x section="rectangle_3" bins="75"/>
-      <y section="rectangle_1" bins="75"/>
-      <y section="rectangle_2" bins="75"/>
+      <x section="1" bins="75"/>
+      <x section="3" bins="75"/>
+      <y section="1" bins="75"/>
+      <y section="2" bins="75"/>
     </cartesian_mesh>
     <boundary x0="0.0" y0="0.0" x1="0.0" y1="40.0" x2="40.0" y2="0.0"/>
     <left_condition a="0.0" b="1.0"/>
