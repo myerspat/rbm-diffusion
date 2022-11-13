@@ -7,3 +7,6 @@
 [submodule "vendor/xtensor-blas"]
 	path = vendor/xtensor-blas
 	url = git@github.com:xtensor-stack/xtensor-blas.git
+[submodule "vendor/pugixml"]
+	path = vendor/pugixml
+	url = git@github.com:zeux/pugixml.git
