@@ -1,6 +1,6 @@
 # Set example files
 set(EXAMPLES
-  one-speed-1D
+  # one-speed-1D
 )
 
 foreach(example ${EXAMPLES})

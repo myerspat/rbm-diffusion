@@ -25,6 +25,12 @@ message(STATUS "RBM C++ flags: ${flags}")
 # Source files
 list(APPEND rbmlib_SOURCES
   src/mesh.cpp
+  src/cell.cpp
+  src/input.cpp
+  src/material.cpp
+  src/meshElement.cpp
+  src/rbm.cpp
+  src/main.cpp
 )
 
 # Archived source files
@@ -45,6 +51,9 @@ set(xtl_DIR ${CMAKE_CURRENT_BINARY_DIR}/vendor/xtl)
 add_subdirectory(vendor/xtensor)
 add_subdirectory(vendor/xtensor-blas)
 
+# pugixml library
+add_subdirectory(vendor/pugixml)
+
 # OpenBLAS
 # set(BLA_VENDER OpenBLAS)
 # find_package(BLAS REQUIRED)
@@ -56,7 +65,7 @@ add_subdirectory(vendor/xtensor-blas)
 target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/opt/OpenBLAS/include/)
 
 target_include_directories(rbmlib PRIVATE ${CMAKE_BINARY_DIR}/include)
-target_link_libraries(rbmlib xtensor xtensor-blas /opt/OpenBLAS/lib/libopenblas.so)
+target_link_libraries(rbmlib xtensor xtensor-blas pugixml /opt/OpenBLAS/lib/libopenblas.so)
 
 include(CTest)
 add_subdirectory(tests)

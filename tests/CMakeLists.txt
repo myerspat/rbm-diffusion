@@ -5,8 +5,8 @@ set(HEADER_FILES
 
 # Add new source files here
 set(SOURCE_FILES
-  test_matrix.cpp
-  test_linalg.cpp
+  # test_matrix.cpp
+  # test_linalg.cpp
   test_mesh.cpp
 )
 
