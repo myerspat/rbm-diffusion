@@ -19,6 +19,8 @@ Run the following commands for a quick start on RBM:
 ```console
 ...clone the repository
 $ git clone git@github.com:myerspat/rbm-diffusion.git
+...download submodules
+$ git submodule init && git submodule update
 ...create build directory
 $ mkdir build && cd build
 ...run build and compile
