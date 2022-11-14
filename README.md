@@ -14,6 +14,14 @@ $ cd OpenBLAS && make
 ...install locally
 $ make install
 ```
+...clone OpenCV repo
+$ git clone git@github.com:opencv/opencv.git 
+...compile
+$ cd opencv && make
+...install locally 
+$ make install
+
+
 
 Run the following commands for a quick start on RBM:
 ```console
