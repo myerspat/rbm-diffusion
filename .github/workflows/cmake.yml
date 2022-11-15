@@ -21,12 +21,6 @@ jobs:
         submodules: recursive
     - name: Build library
       run: |
-        git clone git@github.com:xianyi/OpenBLAS.git
-        cd OpenBLAS && make
-        make install
-        cd ../ && rm -rf OpenBLAS
-        git submodule init
-        git submodule update
         mkdir build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release ..
         make
