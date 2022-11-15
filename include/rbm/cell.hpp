@@ -3,6 +3,7 @@
 
 #include "rbm/material.hpp"
 #include <cstddef>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -19,8 +20,7 @@ public:
 
   //========================================================================
   // Methods
-  void initialize(
-    int id, std::pair<double, double> p0, double l1, double l2);
+  void initialize(int id, std::pair<double, double> p0, double l1, double l2);
 
   //========================================================================
   // Getters
@@ -44,7 +44,7 @@ public:
   // Constructor / Destructor
   Cell() {};
   Cell(int id) : _id(id) {};
-  Cell(int id, std::vector<Section> sections, std::vector<Material> materials)
+  Cell(int id, std::map<int, Section> sections, Material materials)
     : _id(id), _sections(sections), _materials(materials) {};
 
   //========================================================================
@@ -54,15 +54,18 @@ public:
   //========================================================================
   // Getters
   int getID() { return _id; };
-  Section getSection(std::size_t idx) { return _sections[idx]; };
-  Material getMaterial(std::size_t idx) { return _materials[idx]; };
+  Section getSection(std::size_t section_id)
+  {
+    return _sections.find(section_id)->second;
+  };
+  Material getMaterial() { return _materials; };
 
 private:
   //========================================================================
   // Data
   int _id;
-  std::vector<Section> _sections;
-  std::vector<Material> _materials;
+  std::map<int, Section> _sections;
+  Material _materials;
 };
 
 } // namespace mesh
