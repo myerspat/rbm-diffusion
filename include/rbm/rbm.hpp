@@ -15,13 +15,13 @@ public:
   // Methods
   // Initialize rbm with the training points
   virtual void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id);
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id) = 0;
 
   // Create the training subspace
-  virtual void train();
+  virtual void train() = 0;
 
   // Calculate the eigenvalue and eigenvector for the target value
-  virtual std::pair<xt::xarray<double>, double> calcTarget(double target_value);
+  virtual std::pair<xt::xarray<double>, double> calcTarget(double target_value) = 0;
 
   // Reduce the subspace using principle component analysis
   void pcaReduce(
