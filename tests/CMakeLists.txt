@@ -4,15 +4,17 @@ set(HEADER_FILES
 )
 
 # Add new source files here
-set(SOURCE_FILES
-  # test_matrix.cpp
-  # test_linalg.cpp
-  test_mesh.cpp
+set(TEST_FILES
+  test_mesh
+  test_input
+  test_meshElement
+  test_cell
+  test_rbm
+  test_material
 )
 
-foreach(test ${SOURCE_FILES})
-  set(test_name ${test}_ctest)
-  add_executable(${test_name} ${test})
-  target_link_libraries(${test_name} rbmlib)
-  add_test(${test_name} ${test_name})
+foreach(test ${TEST_FILES})
+  add_executable(${test} ${test}.cpp)
+  target_link_libraries(${test} rbmlib)
+  add_test(${test} ${test})
 endforeach()

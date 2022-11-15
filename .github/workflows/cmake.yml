@@ -15,10 +15,13 @@ jobs:
       uses: awalsh128/cache-apt-pkgs-action@latest # Install and cache required apt packages
       with:
         packages: build-essential cmake
+    - name: Checkout submodules
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Build library
       run: |
-        mkdir build
-        cd build
+        mkdir build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release ..
         make
     - name: Run tests

@@ -4,13 +4,20 @@
 
 namespace mesh {
 
-void Mesh::buildCell(
-  Cell& cell, std::vector<size_t>& x_bins, std::vector<size_t>& y_bins)
+void Mesh::initXAxis(
+  std::vector<double>& section_lengths, std::vector<size_t>& x_bins)
+{}
+
+void Mesh::initYAxis(
+  std::vector<double>& section_lengths, std::vector<size_t>& y_bins)
+{}
+
+void Mesh::buildCells(std::vector<Cell>& cells)
 {
   // Build _mash based on the cell and the bins
 }
 
-void Mesh::changeCell(int cell_id, std::string target, double new_value)
+void Mesh::changeCell(int cell_id, std::string& target, double new_value)
 {
   // Change _mash for a given cell so we don't have to reinitialize mesh for
   // every training and target point

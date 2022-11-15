@@ -27,9 +27,9 @@ public:
   //========================================================================
   // Constructors
   Mesh() {};
-  Mesh(size_t xN, size_t yN, std::pair<double, double> left_bound,
-    std::pair<double, double> right_bound, std::pair<double, double> top_bound,
-    std::pair<double, double> bottom_bound)
+  Mesh(size_t xN, size_t yN, std::pair<double, double>& left_bound,
+    std::pair<double, double>& right_bound, std::pair<double, double>& top_bound,
+    std::pair<double, double>& bottom_bound)
     : _xN(xN), _yN(yN), _left_bound(left_bound), _right_bound(right_bound),
       _top_bound(top_bound), _bottom_bound(bottom_bound)
   {
@@ -43,12 +43,19 @@ public:
 
   //========================================================================
   // Methods
+  // Initialize x-axis
+  void initXAxis(
+    std::vector<double>& section_lengths, std::vector<size_t>& x_bins);
+
+  // Initialize y-axis
+  void initYAxis(
+    std::vector<double>& section_lengths, std::vector<size_t>& y_bins);
+
   // Build a rectangular section of the mesh and fill respective mesh elements
-  void buildCell(
-    Cell& cell, std::vector<size_t>& x_bins, std::vector<size_t>& y_bins);
+  void buildCells(std::vector<Cell>& cells);
 
   // Change the target parameter to new_value in every MeshElement with cell_id
-  void changeCell(int cell_id, std::string target, double new_value);
+  void changeCell(int cell_id, std::string& target, double new_value);
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
