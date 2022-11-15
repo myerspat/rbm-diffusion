@@ -12,7 +12,6 @@ public:
   MeshElement() {};
   MeshElement(double dx, double dy, Cell& cell)
     : _dx(dx), _dy(dy), _cell(cell) {};
-  ~MeshElement();
 
   //=========================================================================================
   // Methods
