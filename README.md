@@ -13,6 +13,7 @@ $ git clone git@github.com:myerspat/rbm-diffusion.git
 $ mkdir build && cd build
 ...build and configure
 $ cmake ..&& make
+```
 
 ## Contributing
 Please read this prior to contributing to the repository. The following tutorial assumes you have setup and are using a Linux distribution through Linux, Windows, or Mac. On a Windows machine you can use Windows Subsystems for Linux (WSL).
