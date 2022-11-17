@@ -9,6 +9,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: Install OpenBLAS
+      run: |
+        sudo apt install libopenblas-base
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Install dependencies
@@ -22,7 +25,7 @@ jobs:
     - name: Build library
       run: |
         mkdir build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DOPENBLAS_LIB=/usr/lib/x86_64-linux-gnu/libopenblas.so.0 -DCMAKE_BUILD_TYPE=Release ..
         make
     - name: Run tests
       run: |
