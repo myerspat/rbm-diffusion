@@ -5,7 +5,14 @@ Reduced basis modeling of the neutron diffusion equation using finite difference
 
 ## Installation
 
-RBM uses three submodules: [xtensor](https://github.com/xtensor-stack/xtensor), [xtensor-blas](https://github.com/xtensor-stack/xtensor-blas), and [xtl](https://github.com/xtensor-stack/xtl). Xtensor-blas uses [OpenBLAS](https://github.com/xianyi/OpenBLAS) and is required for RBM. OpenBLAS can be installed using `sudo apt install libopenblas-base` if you are using Ubuntu/Debain.
+RBM uses three submodules: [xtensor](https://github.com/xtensor-stack/xtensor), [xtensor-blas](https://github.com/xtensor-stack/xtensor-blas), and [xtl](https://github.com/xtensor-stack/xtl). Xtensor-blas uses [OpenBLAS](https://github.com/xianyi/OpenBLAS) and is required for RBM. OpenBLAS can be installed using `sudo apt install libopenblas-base` if you are using Ubuntu/Debain. To download and use `rbm-diffusion` run:
+```console
+...clone the repo
+$ git clone git@github.com:myerspat/rbm-diffusion.git
+...make build directory
+$ mkdir build && cd build
+...build and configure
+$ cmake ..&& make
 
 ## Contributing
 Please read this prior to contributing to the repository. The following tutorial assumes you have setup and are using a Linux distribution through Linux, Windows, or Mac. On a Windows machine you can use Windows Subsystems for Linux (WSL).
