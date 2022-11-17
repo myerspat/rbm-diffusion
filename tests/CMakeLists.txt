@@ -13,8 +13,14 @@ set(TEST_FILES
   test_material
 )
 
+# For each test in TEST_FILES
 foreach(test ${TEST_FILES})
+  # Add test executable
   add_executable(${test} ${test}.cpp)
-  target_link_libraries(${test} rbmlib)
+
+  # Link the test to rbm library
+  target_link_libraries(${test} rbm)
+
+  # Add test to ctest suite
   add_test(${test} ${test})
 endforeach()
