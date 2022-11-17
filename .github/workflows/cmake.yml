@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Install OpenBLAS
       run: |
-        sudo apt install openblas-base
+        sudo apt install libopenblas-base
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Install dependencies
