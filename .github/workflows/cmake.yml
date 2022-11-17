@@ -9,6 +9,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: Install OpenBLAS
+      run: |
+        sudo apt install openblas-base
     - name: Checkout repo
       uses: actions/checkout@v3
     - name: Install dependencies
