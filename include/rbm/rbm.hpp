@@ -21,11 +21,11 @@ public:
   virtual void train() = 0;
 
   // Calculate the eigenvalue and eigenvector for the target value
-  virtual std::pair<xt::xarray<double>, double> calcTarget(double target_value) = 0;
+  virtual std::pair<xt::xarray<double>, double> calcTarget(
+    double target_value) = 0;
 
   // Reduce the subspace using principle component analysis
-  void pcaReduce(
-    xt::xarray<double>& training_fluxes, xt::xarray<double>& training_k);
+  void pcaReduce(xt::xarray<double>& training_fluxes);
 
   // Construct the target fission matrix
   xt::xarray<double> constructF_t(
