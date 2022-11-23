@@ -20,6 +20,9 @@ TEST(test_pcaReduce_1)
   // Initialize object for PCA
   rbm::PerturbAbsorption object;
 
+  // Set size of reduced subspace to 2 PCs
+  object.setNumPCs(2);
+
   // Run pcaReduce on Iris data
   object.pcaReduce(data);
 
