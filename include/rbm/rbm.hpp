@@ -34,6 +34,15 @@ public:
   // Construct the target migration matrix
   xt::xarray<double> constructM_t(
     const xt::xarray<double>& M, const xt::xarray<double>& training_fluxes);
+
+  // Set the number of PCs to keep in reduction
+  void setNumPCs(const size_t num_pcs) { _num_pcs = num_pcs; }
+
+private:
+  //=============================================================
+  // Data
+  // TODO: Make _num_pcs editable for the user in the XML interface
+  size_t _num_pcs = 3; // number of PCs to keep when reducing, defualts to 3
 };
 
 class PerturbAbsorption : public RBM {

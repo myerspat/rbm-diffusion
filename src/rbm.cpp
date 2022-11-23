@@ -1,6 +1,7 @@
 #include "rbm/rbm.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xtensor_forward.hpp"
+#include <cstdio>
 #include <utility>
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xview.hpp>
@@ -30,27 +31,31 @@ void RBM::pcaReduce(xt::xarray<double>& training_fluxes)
   // Calculate total variance
   double total_variance = xt::sum(xt::square(L))(0);
 
-  // Reduce subspace to the first PCs with 80% of the original variance
-  // TODO: Replace 0.8 with a user choice between 0 and 1 for variance they want
-  // to preserve
-  size_t num_pcs = 1;
+  // Reduce subspace to the first PCs to _num_pcs
   double var = 0.0;
-  while (var < 0.8 * total_variance && num_pcs <= rank) {
-    var += (L(num_pcs - 1) * L(num_pcs - 1));
-    num_pcs++;
+  for (size_t i = 0; i < _num_pcs; i++) {
+    var += (L(i) * L(i));
+  }
+
+  // Throw warning if the number of PCs preserved is less than 90% of the total
+  // variance
+  if (var < 0.9 * total_variance) {
+    printf("Warning: Subspace was reduced to %lu PCs which has only %lg "
+           "percent of the total variance\n",
+      _num_pcs, var / total_variance * 100);
   }
 
   // Reduced U, L, and At
-  xt::xarray<double> U_r = xt::view(U, xt::all(), xt::range(0, num_pcs));
-  xt::xarray<double> L_r = xt::view(L, xt::range(0, num_pcs));
+  xt::xarray<double> U_r = xt::view(U, xt::all(), xt::range(0, _num_pcs));
+  xt::xarray<double> L_r = xt::view(L, xt::range(0, _num_pcs));
   xt::xarray<double> At_r =
-    xt::view(At, xt::range(0, num_pcs), xt::range(0, num_pcs));
+    xt::view(At, xt::range(0, _num_pcs), xt::range(0, _num_pcs));
 
   // Calculate reduced training_fluxes
   training_fluxes = xt::linalg::dot(U_r, xt::linalg::dot(xt::diag(L_r), At_r));
 
   // Uncenter training_fluxes with col_means from 0 to num_pcs
-  col_means = xt::view(col_means, xt::range(0, num_pcs));
+  col_means = xt::view(col_means, xt::range(0, _num_pcs));
   for (size_t i = 0; i < training_fluxes.shape(0); i++) {
     auto center = xt::view(training_fluxes, i, xt::all());
     center += col_means;
