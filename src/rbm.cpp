@@ -20,15 +20,12 @@ void RBM::pcaReduce(xt::xarray<double>& training_fluxes)
   size_t rank = xt::linalg::matrix_rank(training_fluxes);
 
   // Singular value decomposition
-  auto SVD = xt::linalg::svd(training_fluxes);
+  auto [U, L, At] = xt::linalg::svd(training_fluxes);
 
   // Extract U, L, and A' (At) from X = ULA'
   // l is given as a row vector but is really a diagonal metrix that is
   // rank x rank
-  xt::xarray<double> U = std::get<0>(SVD);
   U = xt::view(U, xt::all(), xt::range(0, rank));
-  xt::xarray<double> L = std::get<1>(SVD);
-  xt::xarray<double> At = std::get<2>(SVD);
 
   // Calculate total variance
   double total_variance = xt::sum(xt::square(L))(0);
