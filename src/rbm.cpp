@@ -42,15 +42,17 @@ std::pair<xt::xarray<double>, double> PerturbAbsorption::calcTarget(
 {
   xt::xarray<double> target_flux = xt::xarray<double>::from_shape({_mesh.getSize()});
   double target_k;
+  // change with specific parameter 
 	std::string absor = "absorption";
      _mesh.changeCell(_cell_id, absor,  target_value);
+     // get F and M matricies
     xt::xarray<double> F = _mesh.constructF(); //(nxn)
     xt::xarray<double> M =  _mesh.constructM(); //(nxn)
     rbm::PerturbAbsorption object;
+    // get F_t and M_t
     xt::xarray<double> F_t = object.constructF_t(F, _training_fluxes);
     xt::xarray<double> M_t = object.constructF_t(M, _training_fluxes);
-  //xt::xarray<double> M = my_mesh.getM();
-  //  xt::xarray<double> F = my_mesh.getF();
+    // calculate the eigenvlue and eigenvector for target 
     xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M_t), F_t);
     auto eigenfunction = xt::linalg::eig(A);
     target_k = 1/(std::get<0>(eigenfunction)(0).real());
