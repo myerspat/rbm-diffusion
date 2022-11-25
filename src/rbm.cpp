@@ -2,7 +2,6 @@
 #include "xtensor-blas/xlinalg.hpp"
 #include "xtensor/xtensor_forward.hpp"
 #include <utility>
-#include "xtensor-blas/xlinalg.hpp"
 
 namespace rbm {
 
@@ -38,16 +37,16 @@ xt::xarray<double> RBM::constructM_t(
   xt::xarray<double> M_t = xt::xarray<double>::from_shape(
     {training_fluxes.shape(0), training_fluxes.shape(0)});
 
-    for (size_t i = 0; i < training_fluxes.shape(1); i++) {
-      // Get flux at i
-      xt::xarray<double> flux_i = xt::view(training_fluxes, xt::all(), i);
-      for (size_t j = 0; j < training_fluxes.shape(1); j++) {
-        // Get flux at j
-	xt::xarray<double> flux_j = xt::view(training_fluxes, xt::all(), j);
-        // Calculate F_t
-        M_t(i, j) = xt::linalg::dot(flux_i, xt::linalg::dot(M, flux_j))(0);
-      }
+  for (size_t i = 0; i < training_fluxes.shape(1); i++) {
+    // Get flux at i
+    xt::xarray<double> flux_i = xt::view(training_fluxes, xt::all(), i);
+    for (size_t j = 0; j < training_fluxes.shape(1); j++) {
+      // Get flux at j
+      xt::xarray<double> flux_j = xt::view(training_fluxes, xt::all(), j);
+      // Calculate F_t
+      M_t(i, j) = xt::linalg::dot(flux_i, xt::linalg::dot(M, flux_j))(0);
     }
+  }
 
   return M_t;
 }
