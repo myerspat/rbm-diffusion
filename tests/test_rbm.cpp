@@ -30,7 +30,10 @@ TEST(ContructM_t_test)
    rbm::PerturbAbsorption object;
    xt::xarray<double> M_t = object.constructM_t(M, Flux);
 
-   ASSERT_ALMOST_EQUAL(M_t(0, 0), 1.2398, 0.001);
+   ASSERT_ALMOST_EQUAL(M_t(0, 0), 1.2398, 0.0001);
+   ASSERT_ALMOST_EQUAL(M_t(1, 0), 0.4698, 0.0001);
+   ASSERT_ALMOST_EQUAL(M_t(0, 1), 0.4698, 0.0001);
+   ASSERT_ALMOST_EQUAL(M_t(1, 1), 1.2874, 0.0001);
 
 
 }
