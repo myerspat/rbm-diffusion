@@ -27,20 +27,14 @@ TEST(ContructF_t_test)
     Flux(1,1)=0.230;
     Flux(2,1)=0.540;
 
- // xt::xarray<double> F_t =  rbm::RBM::constructF_t(F, Flux);
-//  rbm::RBM::constructF_t(F, Flux);
+
    rbm::PerturbAbsorption object;
    xt::xarray<double> F_t = object.constructF_t(F, Flux);
 
    ASSERT_ALMOST_EQUAL(F_t(0, 0), 1.2398, 0.0001);
-
-//    for (size_t i : I) {
-//     for (size_t j : J) {
-//       ASSERT_ALMOST_EQUAL(result.at(i, j), correct_mat[i][j], 0.000001);
-//     }
-//   }
-    
-
+   ASSERT_ALMOST_EQUAL(F_t(1, 0), 0.4698, 0.0001);
+   ASSERT_ALMOST_EQUAL(F_t(0, 1), 0.4698, 0.0001);
+   ASSERT_ALMOST_EQUAL(F_t(1, 1), 1.2874, 0.0001);
 }
 
 TEST_MAIN();
