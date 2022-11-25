@@ -35,7 +35,7 @@ xt::xarray<double> RBM::constructM_t(
 {
   // Initialize M_t and allocate space
   xt::xarray<double> M_t = xt::xarray<double>::from_shape(
-    {training_fluxes.shape(0), training_fluxes.shape(0)});
+    {training_fluxes.shape(1), training_fluxes.shape(1)});
 
   for (size_t i = 0; i < training_fluxes.shape(1); i++) {
     // Get flux at i
