@@ -1,6 +1,7 @@
 #include "rbm/rbm.hpp"
 #include "xtensor/xtensor_forward.hpp"
 #include <utility>
+#include "xtensor-blas/xlinalg.hpp"
 
 namespace rbm {
 
