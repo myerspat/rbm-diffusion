@@ -1,6 +1,7 @@
 #include "rbm/rbm.hpp"
 #include "xtensor/xtensor_forward.hpp"
 #include <utility>
+#include "xtensor-blas/xlinalg.hpp"
 
 namespace rbm {
 
@@ -14,6 +15,14 @@ xt::xarray<double> RBM::constructF_t(
   // Initialize F_t and allocate space
   xt::xarray<double> F_t = xt::xarray<double>::from_shape(
     {training_fluxes.shape(0), training_fluxes.shape(0)});
+
+        for (size_t i = 0; i < training_fluxes.shape(0); i++) {
+      // get row and coln fluxes 
+      auto flux_i = xt::view(xt::transpose(training_fluxes), i, xt::all());
+      auto flux_j = xt::view(training_fluxes, i, xt::all());
+      // find F_t
+      xt::row(F_t, i) = xt::linalg::dot(flux_i, xt::linalg::dot(F, flux_j));
+    }
 
   return F_t;
 }
