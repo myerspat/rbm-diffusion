@@ -17,14 +17,14 @@ TEST(ContructM_t_test)
     M(2,2)=3.5;  
 
  xt::xarray<double> Flux = xt::xarray<double>::from_shape(
-    {2, 3});
+    {3, 2});
     
     Flux(0,0)=0.2;
     Flux(1,0)=0.94;
-    Flux(0,1)=0.03;
-    Flux(1,1)=0.3;
-    Flux(0,2)=0.230;
-    Flux(1,2)=0.540;
+    Flux(2,0)=0.03;
+    Flux(0,1)=0.3;
+    Flux(1,1)=0.230;
+    Flux(2,1)=0.540;
 
 
    rbm::PerturbAbsorption object;
