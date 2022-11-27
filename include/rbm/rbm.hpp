@@ -17,15 +17,14 @@ public:
   //=============================================================
   // Methods
   // Initialize rbm with the training points
-  virtual void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id) = 0;
+  void initialize(
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id);
 
   // Create the training subspace
-  virtual void train() = 0;
+  void train();
 
   // Calculate the eigenvalue and eigenvector for the target value
-  virtual std::pair<xt::xarray<double>, double> calcTarget(
-    double target_value) = 0;
+  std::pair<xt::xarray<double>, double> calcTarget(double target_value);
 
   // Reduce the subspace using principle component analysis
   void pcaReduce(
@@ -38,29 +37,6 @@ public:
   // Construct the target migration matrix
   xt::xarray<double> constructM_t(
     const xt::xarray<double>& M, const xt::xarray<double>& training_fluxes);
-};
-
-class PerturbAbsorption : public RBM {
-public:
-  //=============================================================
-  // Constructors / Destructor
-  PerturbAbsorption() : RBM() {};
-  PerturbAbsorption(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id)
-    : RBM(), _training_points(training_points), _mesh(mesh),
-      _cell_id(cell_id) {};
-
-  //=============================================================
-  // Methods
-  // Initialize rbm with the training points
-  void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id);
-
-  // Create the training subspace
-  void train();
-
-  // Calculate the eigenvalue and eigenvector for the target value
-  std::pair<xt::xarray<double>, double> calcTarget(double target_value);
 
 private:
   //=============================================================
