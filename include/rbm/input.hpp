@@ -33,8 +33,8 @@ std::vector<mesh::Cell> parseCellNode(
 // Parse mesh node and build Mesh
 mesh::Mesh parseMeshNode(const pugi::xml_node& root);
 
-// Parse rbm node and build RBM
-rbm::PerturbAbsorption parseRBMNode(
+// Parse rbm node and build Perturb class
+rbm::Perturb parseRBMNode(
   const pugi::xml_node& root, mesh::Mesh& mesh);
 
 // Get node attribute as type T
