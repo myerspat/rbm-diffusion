@@ -51,13 +51,13 @@ xt::xarray<double> RBM::constructM_t(
   return M_t;
 }
 
-void PerturbAbsorption::initialize(
+void RBM::initialize(
   xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id)
 {}
 
-void PerturbAbsorption::train() {}
+void RBM::train() {}
 
-std::pair<xt::xarray<double>, double> PerturbAbsorption::calcTarget(
+std::pair<xt::xarray<double>, double> RBM::calcTarget(
   double target_value)
 {
   xt::xarray<double> target_flux =
