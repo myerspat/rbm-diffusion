@@ -5,6 +5,9 @@
 
 namespace rbm {
 
+// Enumeration for each possible parameter to perturb
+enum parameter { absorption, D, nu_fission };
+
 class RBM {
 public:
   //=============================================================
@@ -21,7 +24,8 @@ public:
   virtual void train() = 0;
 
   // Calculate the eigenvalue and eigenvector for the target value
-  virtual std::pair<xt::xarray<double>, double> calcTarget(double target_value) = 0;
+  virtual std::pair<xt::xarray<double>, double> calcTarget(
+    double target_value) = 0;
 
   // Reduce the subspace using principle component analysis
   void pcaReduce(
