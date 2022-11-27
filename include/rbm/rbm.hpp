@@ -6,6 +6,7 @@
 namespace rbm {
 
 // Enumeration for each possible parameter to perturb
+// TODO: Move this into Material
 enum Parameter { absorption, D, nu_fission };
 
 class Perturb {
@@ -13,6 +14,10 @@ public:
   //=============================================================
   // Constructors / Destructor
   Perturb() {};
+  Perturb(xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id,
+    Parameter target_parameter)
+    : _training_points(training_points), _mesh(mesh), _cell_id(cell_id),
+      _target_parameter(target_parameter) {};
 
   //=============================================================
   // Methods
@@ -45,9 +50,9 @@ private:
   xt::xarray<double> _training_fluxes; // 2D array of training fluxes
   xt::xarray<double> _training_k;      // 1D array of training k
   mesh::Mesh _mesh;                    // Mesh for the problem
-  int _cell_id;                   // Cell within mesh that will be perturbed
-  Parameter _perturbed_parameter; // Perturbed parameter type (absorption, D,
-                                  // nu_fission)
+  int _cell_id;                // Cell within mesh that will be perturbed
+  Parameter _target_parameter; // Perturbed parameter type (absorption, D,
+                               // nu_fission)
 };
 
 } // namespace rbm
