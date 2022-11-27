@@ -8,11 +8,11 @@ namespace rbm {
 // Enumeration for each possible parameter to perturb
 enum parameter { absorption, D, nu_fission };
 
-class RBM {
+class Perturb {
 public:
   //=============================================================
   // Constructors / Destructor
-  RBM() {};
+  Perturb() {};
 
   //=============================================================
   // Methods
