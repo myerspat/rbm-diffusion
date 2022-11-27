@@ -6,7 +6,7 @@
 namespace rbm {
 
 // Enumeration for each possible parameter to perturb
-enum parameter { absorption, D, nu_fission };
+enum Parameter { absorption, D, nu_fission };
 
 class Perturb {
 public:
@@ -45,7 +45,9 @@ private:
   xt::xarray<double> _training_fluxes; // 2D array of training fluxes
   xt::xarray<double> _training_k;      // 1D array of training k
   mesh::Mesh _mesh;                    // Mesh for the problem
-  int _cell_id; // Cell within mesh that will be perturbed
+  int _cell_id;                   // Cell within mesh that will be perturbed
+  Parameter _perturbed_parameter; // Perturbed parameter type (absorption, D,
+                                  // nu_fission)
 };
 
 } // namespace rbm
