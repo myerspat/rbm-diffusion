@@ -12,9 +12,9 @@ public:
   //=========================================================================================
   // Constructors / Destructor
   MeshElement() {};
-  MeshElement(Material& mat, double& lx, double& ly, std::size_t& id,
-    std::pair<std::size_t, std::size_t> idx_row,
-    std::pair<std::size_t, std::size_t> idx_col)
+  MeshElement(const Material& mat, const double& lx, const double& ly,
+    const std::size_t& id, const std::pair<std::size_t, std::size_t>& idx_row,
+    const std::pair<std::size_t, std::size_t>& idx_col)
     : _idx_row(idx_row), _idx_col(idx_col), _lx(lx), _ly(ly), _id(id), _mat(mat)
   {
     assert(checkIndexing());
