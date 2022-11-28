@@ -67,6 +67,9 @@ public:
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
+  
+  // Assuming row major ordering, returns 1D idx given 2D idx
+  size_t ravelIDX(const size_t& i, const size_t& j);
 
   //========================================================================
   // Getters
