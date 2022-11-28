@@ -93,7 +93,7 @@ bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
 }
 
 void Mesh::changeMaterail(const std::size_t& id, const double& new_value,
-  const std::string& target_parameter)
+  const rbm::Parameter& target_parameter)
 {}
 
 xt::xarray<double> Mesh::constructF()

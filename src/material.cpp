@@ -5,5 +5,5 @@ void Material::initialize(
 {}
 
 void Material::setParameter(
-  const double& new_value, const rbm::Parameter target_parameter)
+  const double& new_value, const rbm::Parameter& target_parameter)
 {}
