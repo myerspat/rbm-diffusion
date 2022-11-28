@@ -4,7 +4,13 @@
 
 namespace mesh {
 
-void Mesh::constructMesh(const std::vector<MeshElement>& elements) {}
+void Mesh::constructMesh(const std::vector<MeshElement>& elements) {
+  // Construct course grid
+  _course_grid = constructCourseGrid(elements);
+
+  // Construct fine grid
+  _fine_grid = constructFineGrid();
+}
 
 xt::xarray<MeshElement> Mesh::constructCourseGrid(
   const std::vector<MeshElement>& elements)
