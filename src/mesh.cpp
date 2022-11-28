@@ -4,96 +4,52 @@
 
 namespace mesh {
 
-void Mesh::initXAxis(
-  std::vector<double>& section_lengths, std::vector<size_t>& x_bins)
-{}
+void Mesh::constructMesh(const std::vector<MeshElement>& elements) {}
 
-void Mesh::initYAxis(
-  std::vector<double>& section_lengths, std::vector<size_t>& y_bins)
-{}
-
-void Mesh::buildCells(std::vector<Cell>& cells)
+xt::xarray<MeshElement> Mesh::constructCourseGrid(
+  const std::vector<MeshElement>& elements)
 {
-  // Build _mash based on the cell and the bins
+  // Allocate space
+  xt::xarray<MeshElement> course_grid({_yN_course, _xN_course});
+
+  return course_grid;
 }
 
-void Mesh::changeCell(int cell_id, std::string& target, double new_value)
+xt::xarray<MeshElement> Mesh::constructFineGrid()
 {
-  // Change _mash for a given cell so we don't have to reinitialize mesh for
-  // every training and target point
+  // Allocate space
+  xt::xarray<MeshElement> fine_grid({_yN_fine, _xN_fine});
+
+  return fine_grid;
 }
+
+bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
+{
+  bool shared_lengths = true;
+
+  return shared_lengths;
+}
+
+void Mesh::changeMaterail(
+  std::size_t id, double new_value, std::string& target_parameter)
+{}
 
 xt::xarray<double> Mesh::constructF()
 {
-  size_t num_elements = getSize();
-  xt::xarray<double> F =
-    xt::xarray<double>::from_shape({num_elements, num_elements});
+  // Allocate space
+  std::vector<size_t> mesh_shape = {getSize(), getSize()};
+  xt::xarray<double> F(mesh_shape);
 
   return F;
 }
 
 xt::xarray<double> Mesh::constructM()
 {
-  size_t num_elements = getSize();
-  xt::xarray<double> M =
-    xt::xarray<double>::from_shape({num_elements, num_elements});
+  // Allocate space
+  std::vector<size_t> mesh_shape = {getSize(), getSize()};
+  xt::xarray<double> M(mesh_shape);
 
   return M;
 }
 
 } // namespace mesh
-
-// void Mesh::run(double fissionXS, double absorptionXS, double D)
-// {
-//   //--------------------------
-//   // Checking boundary Conditions
-//   // Stores a/b in a pair (a,b)
-//   // -------------------------
-//   //
-//   double Do, Dn;
-//   double dx = _distance / static_cast<double>(_N);
-//
-//   // Left boundary conditions: branch statements setting Do tilda
-//   // If a=0  b!= 0  then we get 1/ (0/1) = inf so Do = 0
-//   // If a!=0 b = 0 then 1/ (1/0) = 0 so 1/rL = 0
-//   // else we do normal conditions
-//   if (_left_bound.first == 0.0) {
-//     Do = 0;
-//   } else if (_left_bound.second == 0.0) {
-//     Do = 1.0 / (dx / (2.0 * D));
-//   } else {
-//     Do = 1 / (dx / (2.0 * D) - _left_bound.second / _left_bound.first);
-//   }
-//
-//   // Right boundary conditions: branch statements
-//   if (_right_bound.first == 0.0) {
-//     Dn = 0; // This term is 1 / r
-//   } else if (_right_bound.second == 0.0) {
-//     Dn = 1 / (dx / (2 * D));
-//   } else {
-//     Dn = 1 / (dx / (2 * D) - _right_bound.second / _right_bound.first);
-//   }
-//
-//   // Left boundary (top row)
-//   _M(0, 1) = -1.0 / (dx / (2.0 * D) + dx / (2.0 * D));
-//   _M(0, 0) = absorptionXS * dx + Do - _M(0, 1);
-//   _F(0, 0) = fissionXS * dx;
-//
-//   // Right boundary (bottom row)
-//   int right_idx = _N - 1;
-//   _M(right_idx, right_idx - 1) = -1.0 / (dx / (2.0 * D) + dx / (2.0 * D));
-//   _M(right_idx, right_idx) =
-//     absorptionXS * dx + Dn - _M(right_idx, right_idx - 1);
-//   _F(right_idx, right_idx) = fissionXS * dx;
-//
-//   // For loop iterating of mesh elements
-//   for (int i = 1; i < _N - 1; i++) {
-//     // Build the rest of the migration operator
-//     _M(i, i - 1) = -1.0 / (dx / (2.0 * D) + dx / (2.0 * D));
-//     _M(i, i + 1) = -1.0 / (dx / (2.0 * D) + dx / (2.0 * D));
-//     _M(i, i) = absorptionXS * dx - _M(i, i - 1) - _M(i, i + 1);
-//
-//     // Build fission operator
-//     _F(i, i) = fissionXS * dx;
-//   }
-// }

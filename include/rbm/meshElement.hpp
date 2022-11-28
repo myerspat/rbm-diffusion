@@ -1,7 +1,9 @@
 #ifndef _MESH_ELEMENT_
 #define _MESH_ELEMENT_
 
-#include "rbm/cell.hpp"
+#include "rbm/material.hpp"
+#include <assert.h>
+#include <utility>
 
 namespace mesh {
 
@@ -10,25 +12,46 @@ public:
   //=========================================================================================
   // Constructors / Destructor
   MeshElement() {};
-  MeshElement(double dx, double dy, Cell& cell)
-    : _dx(dx), _dy(dy), _cell(cell) {};
+  MeshElement(Material& mat, double& lx, double& ly, std::size_t& id,
+    std::pair<std::size_t, std::size_t> idx_row,
+    std::pair<std::size_t, std::size_t> idx_col)
+    : _idx_row(idx_row), _idx_col(idx_col), _lx(lx), _ly(ly), _id(id), _mat(mat)
+  {
+    assert(checkIndexing());
+  };
 
   //=========================================================================================
   // Methods
-  void initialize(double dx, double dy, Cell& cell);
+  bool checkIndexing();
 
   //=========================================================================================
   // Getters
-  double dx() { return _dx; };
-  double dy() { return _dy; };
-  Cell& cell() { return _cell; };
+  const Material& getMaterial() const { return _mat; };
+  const std::size_t& getID() const { return _id; };
+  const std::pair<std::size_t, std::size_t>& getRowIdx() const
+  {
+    return _idx_row;
+  };
+  const std::pair<std::size_t, std::size_t>& getColIdx() const
+  {
+    return _idx_col;
+  };
+  const double& getLX() const { return _lx; };
+  const double& getLY() const { return _ly; };
+
+  //=========================================================================================
+  // Setters
+  // TODO: add function call to material function to change perturbation target
+  // parameter value
 
 private:
   //=========================================================================================
   // Data
-  double _dx;
-  double _dy;
-  Cell _cell;
+  Material _mat;
+  std::pair<std::size_t, std::size_t> _idx_row, _idx_col;
+  double _lx;
+  double _ly;
+  std::size_t _id;
 };
 
 } // namespace mesh
