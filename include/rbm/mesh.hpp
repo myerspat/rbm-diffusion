@@ -55,7 +55,8 @@ public:
     const std::vector<MeshElement>& elements);
 
   // Construct fine grid
-  xt::xarray<MeshElement> constructFineGrid();
+  xt::xarray<MeshElement> constructFineGrid(
+    const xt::xarray<MeshElement>& course_grid);
 
   // Check lengths of adjacent elements match for all elements in _course_grid
   bool checkSharedLengths(const xt::xarray<MeshElement>& course_grid);
@@ -70,13 +71,13 @@ public:
   //========================================================================
   // Getters
   // Get the number of bins along the x-axis
-  size_t getXN() const { return _xN_fine; };
+  size_t getXN() const { return _xN_fine * _xN_course; };
 
   // Get the number of bins along the y-axis
-  size_t getYN() const { return _yN_fine; };
+  size_t getYN() const { return _yN_fine * _yN_course; };
 
   // Get the number of total bins in the mesh
-  size_t getSize() { return _xN_fine * _yN_fine; };
+  size_t getSize() { return getXN() * getYN(); };
 };
 
 } // namespace mesh
