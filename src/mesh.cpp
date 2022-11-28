@@ -53,8 +53,6 @@ xt::xarray<MeshElement> Mesh::constructFineGrid(
 
   for (size_t course_i = 0; course_i < course_grid.shape(0); course_i++) {
     // Find the next y position for each time we go up a row in course grid
-    // (note the +1, xt::range is exclusive on the right)
-
     size_t next_fine_i = fine_i + _yN_fine;
 
     // Initialize position on x-axis of fine grid
@@ -66,7 +64,7 @@ xt::xarray<MeshElement> Mesh::constructFineGrid(
       const MeshElement& element = course_grid(course_i, course_j);
 
       // Find the next x position in the fine grid given the elements number of
-      // bins (note the +1, xt::range is exclusive on the right)
+      // bins
       size_t next_fine_j = fine_j + _xN_fine;
 
       // View the square in the fine_grid that corresponds to the course_grid
