@@ -1,7 +1,6 @@
 #ifndef _MESH_
 #define _MESH_
 
-#include "rbm/cell.hpp"
 #include "rbm/meshElement.hpp"
 #include <cassert>
 #include <utility>
@@ -15,47 +14,56 @@ class Mesh {
 private:
   //========================================================================
   // Data
-  xt::xarray<MeshElement> _mesh;           // Mesh centered elements
+  xt::xarray<MeshElement> _fine_grid;      // Mesh centered elements
+  xt::xarray<MeshElement> _course_grid;    // Mesh centered elements
   std::pair<double, double> _left_bound;   // Left boundary condition
   std::pair<double, double> _right_bound;  // Right boundary condition
   std::pair<double, double> _top_bound;    // Top boundary condition
   std::pair<double, double> _bottom_bound; // Bottom boundary condition
-  size_t _xN; // Number of mesh elements in the x direction
-  size_t _yN; // Number of mesh elements in the y direction
+  size_t _xN_fine;
+  size_t _yN_fine;
+  size_t _xN_course; // Number of mesh elements in the x direction
+  size_t _yN_course; // Number of mesh elements in the y direction
 
 public:
   //========================================================================
   // Constructors
   Mesh() {};
-  Mesh(size_t xN, size_t yN, std::pair<double, double>& left_bound,
-    std::pair<double, double>& right_bound, std::pair<double, double>& top_bound,
-    std::pair<double, double>& bottom_bound)
-    : _xN(xN), _yN(yN), _left_bound(left_bound), _right_bound(right_bound),
+  Mesh(const size_t& xN_fine, const size_t& yN_fine, const size_t& xN_course,
+    const size_t& yN_course, const std::pair<double, double>& left_bound,
+    const std::pair<double, double>& right_bound,
+    const std::pair<double, double>& top_bound,
+    const std::pair<double, double>& bottom_bound)
+    : _xN_fine(xN_fine), _yN_fine(yN_fine), _xN_course(xN_course),
+      _yN_course(yN_course), _left_bound(left_bound), _right_bound(right_bound),
       _top_bound(top_bound), _bottom_bound(bottom_bound)
   {
-    // Asserting a and b are both not equal to zero for both boundary conditions
+    // Asserting a and b are both not equal to zero for all boundary conditions
     assert(!(left_bound.first == 0.0 && left_bound.second == 0.0));
     assert(!(right_bound.first == 0.0 && right_bound.second == 0.0));
     assert(!(top_bound.first == 0.0 && top_bound.second == 0.0));
     assert(!(bottom_bound.first == 0.0 && bottom_bound.second == 0.0));
-    _mesh = xt::xarray<MeshElement>::from_shape({_yN, _xN});
   }
 
   //========================================================================
   // Methods
-  // Initialize x-axis
-  void initXAxis(
-    std::vector<double>& section_lengths, std::vector<size_t>& x_bins);
+  // Construct mesh
+  void constructMesh(const std::vector<MeshElement>& elements);
 
-  // Initialize y-axis
-  void initYAxis(
-    std::vector<double>& section_lengths, std::vector<size_t>& y_bins);
+  // Construct course grid
+  xt::xarray<MeshElement> constructCourseGrid(
+    const std::vector<MeshElement>& elements);
 
-  // Build a rectangular section of the mesh and fill respective mesh elements
-  void buildCells(std::vector<Cell>& cells);
+  // Construct fine grid
+  xt::xarray<MeshElement> constructFineGrid(
+    const xt::xarray<MeshElement>& course_grid);
 
-  // Change the target parameter to new_value in every MeshElement with cell_id
-  void changeCell(int cell_id, std::string& target, double new_value);
+  // Check lengths of adjacent elements match for all elements in _course_grid
+  bool checkSharedLengths(const xt::xarray<MeshElement>& course_grid);
+
+  // Change target mesh elements' material property
+  void changeMaterail(const std::size_t& id, const double& new_value,
+    const std::string& target_parameter);
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
@@ -63,13 +71,13 @@ public:
   //========================================================================
   // Getters
   // Get the number of bins along the x-axis
-  size_t getXN() const { return _xN; };
+  size_t getXN() const { return _xN_fine * _xN_course; };
 
   // Get the number of bins along the y-axis
-  size_t getYN() const { return _yN; };
+  size_t getYN() const { return _yN_fine * _yN_course; };
 
   // Get the number of total bins in the mesh
-  size_t getSize() { return _xN * _yN; };
+  size_t getSize() { return getXN() * getYN(); };
 };
 
 } // namespace mesh
