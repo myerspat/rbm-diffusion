@@ -1,9 +1,11 @@
 #include "rbm/mesh.hpp"
+#include "rbm/meshElement.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xslice.hpp"
 #include "xtensor/xview.hpp"
 #include <bits/stdc++.h>
 #include <cstdio>
+#include <xtensor/xarray.hpp>
 
 namespace mesh {
 
@@ -21,6 +23,18 @@ xt::xarray<MeshElement> Mesh::constructCourseGrid(
 {
   // Allocate space
   xt::xarray<MeshElement> course_grid({_yN_course, _xN_course});
+
+  // Iterate through elements
+  for (const auto& element : elements) {
+    // Iterate through row and column indicies and assign respective elements
+    for (size_t i = element.getRowIdx().first; i <= element.getRowIdx().second;
+         i++) {
+      for (size_t j = element.getColIdx().first;
+           j <= element.getColIdx().second; j++) {
+        course_grid(i, j) = element;
+      }
+    }
+  }
 
   return course_grid;
 }
@@ -80,8 +94,8 @@ bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
   return shared_lengths;
 }
 
-void Mesh::changeMaterail(
-  std::size_t id, double new_value, std::string& target_parameter)
+void Mesh::changeMaterail(const std::size_t& id, const double& new_value,
+  const std::string& target_parameter)
 {}
 
 xt::xarray<double> Mesh::constructF()
