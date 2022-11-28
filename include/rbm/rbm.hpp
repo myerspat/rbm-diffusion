@@ -2,12 +2,9 @@
 #define _RBM_
 
 #include "rbm/mesh.hpp"
+#include "rbm/rbmEnums.hpp"
 
 namespace rbm {
-
-// Enumeration for each possible parameter to perturb
-// TODO: Move this into Material
-enum Parameter { absorption, D, nu_fission };
 
 class Perturb {
 public:

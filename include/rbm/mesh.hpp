@@ -2,6 +2,7 @@
 #define _MESH_
 
 #include "rbm/meshElement.hpp"
+#include "rbm/rbmEnums.hpp"
 #include <cassert>
 #include <utility>
 #include <vector>
@@ -63,7 +64,7 @@ public:
 
   // Change target mesh elements' material property
   void changeMaterail(const std::size_t& id, const double& new_value,
-    const std::string& target_parameter);
+    const rbm::Parameter target_parameter);
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
