@@ -36,7 +36,6 @@ message(STATUS "RBM C++ flags: ${flags}")
 # Source files
 list(APPEND rbm_SOURCES
   src/mesh.cpp
-  src/cell.cpp
   src/input.cpp
   src/material.cpp
   src/meshElement.cpp

@@ -23,11 +23,11 @@ int main(int argc, char* argv[])
   assert(xml_file.child("rbm"));
   pugi::xml_node rbm_root = util::getNode(xml_file, "rbm");
 
-  // Build mesh from xml file
-  mesh::Mesh mesh = util::parseMeshNode(rbm_root);
-
-  // Build target pertubation parameter
-  rbm::PerturbAbsorption parameter = util::parseRBMNode(rbm_root, mesh);
+  // // Build mesh from xml file
+  // mesh::Mesh mesh = util::parseMeshNode(rbm_root);
+  //
+  // // Build target pertubation parameter
+  // rbm::PerturbAbsorption parameter = util::parseRBMNode(rbm_root, mesh);
 
   // Get target node and parse target values
   pugi::xml_node target_node = util::getNode(rbm_root.child("rbm"), "target");
@@ -40,14 +40,14 @@ int main(int argc, char* argv[])
   xt::xarray<double> target_k =
     xt::xarray<double>::from_shape({target_values.size()});
 
-  for (size_t i = 0; i < target_values.size(); i++) {
-    // Calculate the eigenvector and eigenvalue for parameter target
-    std::pair<xt::xarray<double>, double> target =
-      parameter.calcTarget(target_values[i]);
-
-    // Fill target eigenvector array
-    target_k(i) = target.second;
-  }
+  // for (size_t i = 0; i < target_values.size(); i++) {
+  //   // Calculate the eigenvector and eigenvalue for parameter target
+  //   std::pair<xt::xarray<double>, double> target =
+  //     parameter.calcTarget(target_values[i]);
+  //
+  //   // Fill target eigenvector array
+  //   target_k(i) = target.second;
+  // }
 
   // Print target k values
   std::cout << target_k << std::endl;

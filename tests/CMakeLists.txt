@@ -8,7 +8,6 @@ set(TEST_FILES
   test_mesh
   test_input
   test_meshElement
-  test_cell
   test_rbm
   test_material
 )
