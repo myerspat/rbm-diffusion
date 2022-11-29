@@ -1,7 +1,6 @@
 #ifndef _INPUT_
 #define _INPUT_
 
-#include "rbm/cell.hpp"
 #include "rbm/material.hpp"
 #include "rbm/mesh.hpp"
 #include "rbm/rbm.hpp"
@@ -23,18 +22,11 @@ pugi::xml_node getNode(
 // Parse materials node
 std::vector<Material> parseMaterialsNode(const pugi::xml_node& root);
 
-// Parse sections node
-std::map<int, mesh::Section> parseSectionsNode(const pugi::xml_node& root);
-
-// Parse cells node
-std::vector<mesh::Cell> parseCellNode(
-  const pugi::xml_node& root, const std::map<int, mesh::Section>& sections);
-
 // Parse mesh node and build Mesh
 mesh::Mesh parseMeshNode(const pugi::xml_node& root);
 
-// Parse rbm node and build RBM
-rbm::PerturbAbsorption parseRBMNode(
+// Parse rbm node and build Perturb class
+rbm::Perturb parseRBMNode(
   const pugi::xml_node& root, mesh::Mesh& mesh);
 
 // Get node attribute as type T

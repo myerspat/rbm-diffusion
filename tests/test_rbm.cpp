@@ -67,7 +67,7 @@ TEST(ContructM_t_test)
   Flux(1, 1) = 0.230;
   Flux(2, 1) = 0.540;
 
-  rbm::PerturbAbsorption object;
+  rbm::Perturb object;
   xt::xarray<double> M_t = object.constructM_t(M, Flux);
 
   ASSERT_ALMOST_EQUAL(M_t(0, 0), 1.2398, 0.0001);
@@ -99,7 +99,7 @@ TEST(ContructF_t_test)
   Flux(1, 1) = 0.230;
   Flux(2, 1) = 0.540;
 
-  rbm::PerturbAbsorption object;
+  rbm::Perturb object;
   xt::xarray<double> F_t = object.constructF_t(F, Flux);
 
   ASSERT_ALMOST_EQUAL(F_t(0, 0), 1.2398, 0.0001);

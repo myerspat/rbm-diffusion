@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   mesh::Mesh mesh = util::parseMeshNode(rbm_root);
 
   // Build target pertubation parameter
-  rbm::PerturbAbsorption parameter = util::parseRBMNode(rbm_root, mesh);
+  rbm::Perturb parameter = util::parseRBMNode(rbm_root, mesh);
 
   // Get target node and parse target values
   pugi::xml_node target_node = util::getNode(rbm_root.child("rbm"), "target");
@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
     util::parseString<double>(target_node, "values");
 
   // Allocate space for eigenvectors and eigenvalues
-  // xt::xarray<double> target_fluxes =
-  //   xt::xarray<double>::from_shape({target_values.size(), mesh.getSize()});
+  xt::xarray<double> target_fluxes =
+    xt::xarray<double>::from_shape({target_values.size(), mesh.getSize()});
   xt::xarray<double> target_k =
     xt::xarray<double>::from_shape({target_values.size()});
 

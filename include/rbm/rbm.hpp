@@ -2,27 +2,31 @@
 #define _RBM_
 
 #include "rbm/mesh.hpp"
+#include "rbm/rbmEnums.hpp"
 
 namespace rbm {
 
-class RBM {
+class Perturb {
 public:
   //=============================================================
   // Constructors / Destructor
-  RBM() {};
+  Perturb() {};
+  Perturb(xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id,
+    Parameter target_parameter)
+    : _training_points(training_points), _mesh(mesh), _element_id(element_id),
+      _target_parameter(target_parameter) {};
 
   //=============================================================
   // Methods
   // Initialize rbm with the training points
-  virtual void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id) = 0;
+  void initialize(
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id);
 
   // Create the training subspace
-  virtual void train() = 0;
+  void train();
 
   // Calculate the eigenvalue and eigenvector for the target value
-  virtual std::pair<xt::xarray<double>, double> calcTarget(
-    double target_value) = 0;
+  std::pair<xt::xarray<double>, double> calcTarget(double target_value);
 
   // Reduce the subspace using principle component analysis
   void pcaReduce(xt::xarray<double>& training_fluxes);
@@ -41,40 +45,14 @@ public:
 private:
   //=============================================================
   // Data
-  // TODO: Make _num_pcs editable for the user in the XML interface
-  size_t _num_pcs = 3; // number of PCs to keep when reducing, defualts to 3
-};
-
-class PerturbAbsorption : public RBM {
-public:
-  //=============================================================
-  // Constructors / Destructor
-  PerturbAbsorption() : RBM() {};
-  PerturbAbsorption(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id)
-    : RBM(), _training_points(training_points), _mesh(mesh),
-      _cell_id(cell_id) {};
-
-  //=============================================================
-  // Methods
-  // Initialize rbm with the training points
-  void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id);
-
-  // Create the training subspace
-  void train();
-
-  // Calculate the eigenvalue and eigenvector for the target value
-  std::pair<xt::xarray<double>, double> calcTarget(double target_value);
-
-private:
-  //=============================================================
-  // Data
   xt::xarray<double> _training_points; // 1D array of training paramaters
   xt::xarray<double> _training_fluxes; // 2D array of training fluxes
   xt::xarray<double> _training_k;      // 1D array of training k
   mesh::Mesh _mesh;                    // Mesh for the problem
-  int _cell_id; // Cell within mesh that will be perturbed
+  size_t _num_pcs = 3; // number of PCs to keep when reducing, defualts to 3
+  size_t _element_id;             // Element within mesh that will be perturbed
+  Parameter _target_parameter; // Perturbed parameter type (absorption, D,
+                               // nu_fission)
 };
 
 } // namespace rbm
