@@ -15,7 +15,7 @@ public:
   // Methods
   // Initialize rbm with the training points
   virtual void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id) = 0;
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& element_id) = 0;
 
   // Create the training subspace
   virtual void train() = 0;
@@ -42,15 +42,15 @@ public:
   // Constructors / Destructor
   PerturbAbsorption() : RBM() {};
   PerturbAbsorption(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id)
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id)
     : RBM(), _training_points(training_points), _mesh(mesh),
-      _cell_id(cell_id) {};
+      _element_id(element_id) {};
 
   //=============================================================
   // Methods
   // Initialize rbm with the training points
   void initialize(
-    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id);
+    xt::xarray<double>& training_points, mesh::Mesh& mesh, int& element_id);
 
   // Create the training subspace
   void train();
@@ -65,7 +65,7 @@ private:
   xt::xarray<double> _training_fluxes; // 2D array of training fluxes
   xt::xarray<double> _training_k;      // 1D array of training k
   mesh::Mesh _mesh;                    // Mesh for the problem
-  int _cell_id; // Cell within mesh that will be perturbed
+  size_t _element_id; // Cell within mesh that will be perturbed
 };
 
 } // namespace rbm
