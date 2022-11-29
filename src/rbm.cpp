@@ -52,7 +52,7 @@ xt::xarray<double> Perturb::constructM_t(
 }
 
 void Perturb::initialize(
-  xt::xarray<double>& training_points, mesh::Mesh& mesh, int& cell_id)
+  xt::xarray<double>& training_points, mesh::Mesh& mesh, int& element_id)
 {}
 
 void Perturb::train() {}
