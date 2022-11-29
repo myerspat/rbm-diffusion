@@ -131,7 +131,7 @@ TEST(test_parseRBMNode_1)
   mesh::Mesh mesh = util::parseMeshNode(root);
 
   // Parse RBM node and initialize
-  rbm::PerturbAbsorption parameter = util::parseRBMNode(root, mesh);
+  rbm::Perturb parameter = util::parseRBMNode(root, mesh);
 
   // No assertions included for this test as the RBM class does not have any
   // accessors at the moment
