@@ -1,37 +1,188 @@
+#include "rbm/material.hpp"
 #include "rbm/mesh.hpp"
+#include "rbm/meshElement.hpp"
 #include "unit_test_framework.hpp"
+#include <cstddef>
 #include <utility>
 #include <xtensor/xarray.hpp>
 
-TEST(build_mesh)
+TEST(test_constructFineGrid_1)
 {
-  // // Setting bounds
-  // std::pair<double, double> left_bound = std::make_pair(0.0, 1.0);
-  // std::pair<double, double> right_bound = std::make_pair(1.0, -2.0);
-  //
-  // // creating mesh and running
-  // Mesh my_mesh(80, 30, left_bound, right_bound);
-  // my_mesh.run(0.11, 0.10, 2.0);
-  //
-  // // Get matricies
-  // xt::xarray<double> fission_mat = my_mesh.getF();
-  // xt::xarray<double> migration_mat = my_mesh.getM();
-  //
-  // // Checking Results of middle diag values
-  // for (int i = 1; i < 80 - 1; i++) {
-  //   ASSERT_ALMOST_EQUAL(fission_mat(i, i), 0.04125, .00001);
-  //   ASSERT_ALMOST_EQUAL(migration_mat(i, i - 1), -5.33333333, 0.00001)
-  //   ASSERT_ALMOST_EQUAL(migration_mat(i, i + 1), -5.33333333, 0.00001)
-  //   ASSERT_ALMOST_EQUAL(migration_mat(i, i), 10.70416667, 0.00001)
-  // }
-  //
-  // // Testing for [79][78] and [79][79] positions
-  // ASSERT_ALMOST_EQUAL(migration_mat(79, 79), 5.84844527, 0.8);
-  // ASSERT_ALMOST_EQUAL(migration_mat(79, 78), -5.3333333, 0.8);
-  //
-  // // Testing for [0][0] and [0][1]
-  // ASSERT_ALMOST_EQUAL(migration_mat(0, 0), 5.3708333, 0.8);
-  // ASSERT_ALMOST_EQUAL(migration_mat(0, 1), -5.3333333, 0.8);
+  // Initialize materials
+  Material fuel("fuel", 0.10, 0.11, 2.0);
+  Material reflector("reflector", 0.01, 0.0, 1.5);
+
+  // Lengths
+  double lx_0 = 30.0;
+  double ly_0 = 30.0;
+  double lx_1 = 10.0;
+  double ly_1 = 10.0;
+
+  // Create mesh elements
+  // Fuel region
+  size_t id_0 = 0;
+  mesh::MeshElement e_1(
+    fuel, lx_0, ly_0, id_0, std::make_pair(0, 0), std::make_pair(0, 0));
+
+  // Reflector region
+  size_t id_1 = 1;
+  mesh::MeshElement e_2(
+    reflector, lx_1, ly_0, id_1, std::make_pair(0, 0), std::make_pair(1, 1));
+  mesh::MeshElement e_3(
+    reflector, lx_0, ly_1, id_1, std::make_pair(1, 1), std::make_pair(0, 0));
+  mesh::MeshElement e_4(
+    reflector, lx_1, ly_1, id_1, std::make_pair(1, 1), std::make_pair(1, 1));
+
+  // Create course grid
+  xt::xarray<mesh::MeshElement> course_grid = {{e_1, e_2}, {e_3, e_4}};
+
+  // Initialize mesh
+  size_t xN_fine = 10;
+  size_t yN_fine = 10;
+  size_t xN_course = 2;
+  size_t yN_course = 2;
+  std::pair<double, double> bounds = std::make_pair(0.0, 1.0);
+  mesh::Mesh mesh(
+    xN_fine, yN_fine, xN_course, yN_course, bounds, bounds, bounds, bounds);
+
+  // Construct fine grid
+  auto fine_grid = mesh.constructFineGrid(course_grid);
+
+  // Assertions
+  ASSERT_EQUAL(mesh.getSize(), 400);
+  for (size_t i = 0; i < 10; i++) {
+    // Fuel region
+    for (size_t j = 0; j < 10; j++) {
+      ASSERT_EQUAL(
+        fine_grid(i, j).getMaterial().getName(), e_1.getMaterial().getName());
+    }
+
+    // Right reflector region
+    for (size_t j = 10; j < 20; j++) {
+      ASSERT_EQUAL(
+        fine_grid(i, j).getMaterial().getName(), e_2.getMaterial().getName());
+      ASSERT_EQUAL(fine_grid(i, j).getLX(), e_2.getLX());
+      ASSERT_EQUAL(fine_grid(i, j).getLY(), e_2.getLY());
+    }
+  }
+
+  // Upper reflector region
+  for (size_t i = 10; i < 20; i++) {
+    for (size_t j = 0; j < 10; j++) {
+      ASSERT_EQUAL(
+        fine_grid(i, j).getMaterial().getName(), e_3.getMaterial().getName());
+      ASSERT_EQUAL(fine_grid(i, j).getLX(), e_3.getLX());
+      ASSERT_EQUAL(fine_grid(i, j).getLY(), e_3.getLY());
+    }
+
+    // Right reflector region
+    for (size_t j = 10; j < 20; j++) {
+      ASSERT_EQUAL(
+        fine_grid(i, j).getMaterial().getName(), e_4.getMaterial().getName());
+      ASSERT_EQUAL(fine_grid(i, j).getLX(), e_4.getLX());
+      ASSERT_EQUAL(fine_grid(i, j).getLY(), e_4.getLY());
+    }
+  }
+}
+
+TEST(test_constructCourseGrid_1)
+{
+  // Material 1
+  Material mat_1("fuel", 0.10, 0.11, 2.0);
+
+  // Element 1
+  double lx_1 = 30;
+  double ly_1 = 10;
+  size_t id_1 = 0;
+  std::pair<size_t, size_t> idx_row_1 = std::make_pair(0, 1);
+  std::pair<size_t, size_t> idx_col_1 = std::make_pair(0, 0);
+  mesh::MeshElement element_1(mat_1, lx_1, ly_1, id_1, idx_row_1, idx_col_1);
+
+  // Material 2
+  Material mat_2("reflector", 0.01, 0.0, 1.5);
+
+  // Element 2
+  double lx_2 = 10;
+  double ly_2 = 10;
+  size_t id_2 = 0;
+  std::pair<size_t, size_t> idx_row_2 = std::make_pair(0, 1);
+  std::pair<size_t, size_t> idx_col_2 = std::make_pair(1, 1);
+  mesh::MeshElement element_2(mat_2, lx_2, ly_2, id_2, idx_row_2, idx_col_2);
+
+  // Elements vector
+  std::vector<mesh::MeshElement> elements = {element_1, element_2};
+
+  // Initialize mesh
+  size_t xN_fine, yN_fine;
+  size_t xN_course = 2, yN_course = 2;
+  std::pair<double, double> bounds = std::make_pair(0, 1);
+  mesh::Mesh mesh(
+    xN_fine, yN_fine, xN_course, yN_course, bounds, bounds, bounds, bounds);
+
+  // Create xarray of MeshElements using the vector
+  auto course_grid = mesh.constructCourseGrid(elements);
+
+  // Assertions
+  ASSERT_EQUAL("reflector", course_grid(1, 1).getMaterial().getName());
+  ASSERT_EQUAL(lx_1, course_grid(0, 0).getLX());
+  ASSERT_EQUAL(lx_2, course_grid(0, 1).getLX());
+}
+
+TEST(test_constructF_1)
+{
+  // Initialize materials
+  Material fuel("fuel", 0.10, 0.11, 2.0);
+  Material reflector("reflector", 0.01, 0.0, 1.5);
+
+  // Lengths
+  double lx_0 = 30.0;
+  double ly_0 = 30.0;
+  double lx_1 = 10.0;
+  double ly_1 = 10.0;
+
+  // Create mesh elements
+  // Fuel region
+  size_t id_0 = 0;
+  mesh::MeshElement e_1(
+    fuel, lx_0, ly_0, id_0, std::make_pair(0, 0), std::make_pair(0, 0));
+
+  // Reflector region
+  size_t id_1 = 1;
+  mesh::MeshElement e_2(
+    reflector, lx_1, ly_0, id_1, std::make_pair(0, 0), std::make_pair(1, 1));
+  mesh::MeshElement e_3(
+    reflector, lx_0, ly_1, id_1, std::make_pair(1, 1), std::make_pair(0, 0));
+  mesh::MeshElement e_4(
+    reflector, lx_1, ly_1, id_1, std::make_pair(1, 1), std::make_pair(1, 1));
+
+  // Create course grid
+  std::vector<mesh::MeshElement> elements = {e_1, e_2, e_3, e_4};
+
+  // Initialize mesh
+  size_t xN_fine = 10;
+  size_t yN_fine = 10;
+  size_t xN_course = 2;
+  size_t yN_course = 2;
+  std::pair<double, double> bounds = std::make_pair(0.0, 1.0);
+  mesh::Mesh mesh(
+    xN_fine, yN_fine, xN_course, yN_course, bounds, bounds, bounds, bounds);
+
+  // Construct mesh given vector of elements
+  mesh.constructMesh(elements);
+
+  auto F = mesh.constructF();
+  for (size_t i = 0; i < 10; i++) {
+    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+  }
+  for (size_t i = 10; i < 20; i++) {
+    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+  }
+  for (size_t i = 20; i < 30; i++) {
+    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+  }
+  for (size_t i = mesh.getSize() - 20; i < mesh.getSize(); i++) {
+    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+  }
 }
 
 TEST_MAIN();

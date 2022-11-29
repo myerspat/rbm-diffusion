@@ -2,11 +2,10 @@
 
 namespace mesh {
 
-void MeshElement::initialize(double dx, double dy, Cell& cell)
-{
-  _dx = dx;
-  _dy = dy;
-  _cell = cell;
+bool MeshElement::checkIndexing() {
+  bool valid_indexing = true;
+
+  return valid_indexing;
 }
 
 } // namespace mesh
