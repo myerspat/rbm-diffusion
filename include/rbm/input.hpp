@@ -22,13 +22,6 @@ pugi::xml_node getNode(
 // Parse materials node
 std::vector<Material> parseMaterialsNode(const pugi::xml_node& root);
 
-// // Parse sections node
-// std::map<int, mesh::Section> parseSectionsNode(const pugi::xml_node& root);
-//
-// // Parse cells node
-// std::vector<mesh::Cell> parseCellNode(
-//   const pugi::xml_node& root, const std::map<int, mesh::Section>& sections);
-
 // Parse mesh node and build Mesh
 mesh::Mesh parseMeshNode(const pugi::xml_node& root);
 

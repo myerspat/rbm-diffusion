@@ -138,8 +138,7 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
   return mesh;
 }
 
-rbm::PerturbAbsorption parseRBMNode(
-  const pugi::xml_node& root, mesh::Mesh& mesh)
+rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
 {
   // Get rbm node
   pugi::xml_node rbm_node = util::getNode(root, "rbm");
@@ -150,11 +149,28 @@ rbm::PerturbAbsorption parseRBMNode(
   // Get cell id that will be perturbed
   size_t element_id = util::getAttribute<int>(training_node, "element_id");
 
+  // Get target parameter
+  std::string parameter =
+    util::getAttribute<std::string>(training_node, "parameter");
+
+  // Convert target parameter to enum value
+  rbm::Parameter target_parameter;
+  if (parameter == "absorption") {
+    target_parameter = rbm::Parameter::absorption;
+  } else if (parameter == "nu_fission") {
+    target_parameter = rbm::Parameter::nu_fission;
+  } else if (parameter == "D") {
+    target_parameter = rbm::Parameter::D;
+  } else {
+    throw std::runtime_error("The parameter provided (" + parameter +
+                             ") is not absorption, nu_fission, or D");
+  }
+
   // Parse training fluxes
   xt::xarray<double> training_points =
     xt::adapt(util::parseString<double>(training_node, "values"));
 
-  return rbm::PerturbAbsorption(training_points, mesh, element_id);
+  return rbm::Perturb(training_points, mesh, element_id, target_parameter);
 }
 
 } // namespace util
