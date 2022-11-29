@@ -66,12 +66,11 @@ std::pair<xt::xarray<double>, double> Perturb::calcTarget(
     xt::xarray<double>::from_shape({_mesh.getSize()});
   double target_k;
   // change with specific parameter
-  std::string absor = "absorption";
-  _mesh.changeCell(_cell_id, absor, target_value);
+  _mesh.changeMaterail(_element_id, target_value,_target_parameter);
   // get F and M matricies
   xt::xarray<double> F = _mesh.constructF(); //(nxn)
   xt::xarray<double> M = _mesh.constructM(); //(nxn)
-  rbm::PerturbAbsorption object;
+  rbm::Perturb object;
   // get F_t and M_t
   xt::xarray<double> F_t = object.constructF_t(F, _training_fluxes);
   xt::xarray<double> M_t = object.constructF_t(M, _training_fluxes);
@@ -82,6 +81,7 @@ std::pair<xt::xarray<double>, double> Perturb::calcTarget(
   xt::col(target_flux, 0) = std::get<1>(eigenfunction)(0).real();
 
   return std::make_pair(target_flux, target_k);
+
 }
 
 } // namespace rbm
