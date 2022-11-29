@@ -18,7 +18,7 @@ TEST(test_pcaReduce_1)
   file_in.close();
 
   // Initialize object for PCA
-  rbm::PerturbAbsorption object;
+  rbm::Perturb object;
 
   // Set size of reduced subspace to 2 PCs
   object.setNumPCs(2);
