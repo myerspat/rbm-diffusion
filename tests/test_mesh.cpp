@@ -128,4 +128,61 @@ TEST(test_constructCourseGrid_1)
   ASSERT_EQUAL(lx_2, course_grid(0, 1).getLX());
 }
 
+TEST(test_constructF_1)
+{
+  // Initialize materials
+  Material fuel("fuel", 0.10, 0.11, 2.0);
+  Material reflector("reflector", 0.01, 0.0, 1.5);
+
+  // Lengths
+  double lx_0 = 30.0;
+  double ly_0 = 30.0;
+  double lx_1 = 10.0;
+  double ly_1 = 10.0;
+
+  // Create mesh elements
+  // Fuel region
+  size_t id_0 = 0;
+  mesh::MeshElement e_1(
+    fuel, lx_0, ly_0, id_0, std::make_pair(0, 0), std::make_pair(0, 0));
+
+  // Reflector region
+  size_t id_1 = 1;
+  mesh::MeshElement e_2(
+    reflector, lx_1, ly_0, id_1, std::make_pair(0, 0), std::make_pair(1, 1));
+  mesh::MeshElement e_3(
+    reflector, lx_0, ly_1, id_1, std::make_pair(1, 1), std::make_pair(0, 0));
+  mesh::MeshElement e_4(
+    reflector, lx_1, ly_1, id_1, std::make_pair(1, 1), std::make_pair(1, 1));
+
+  // Create course grid
+  std::vector<mesh::MeshElement> elements = {e_1, e_2, e_3, e_4};
+
+  // Initialize mesh
+  size_t xN_fine = 10;
+  size_t yN_fine = 10;
+  size_t xN_course = 2;
+  size_t yN_course = 2;
+  std::pair<double, double> bounds = std::make_pair(0.0, 1.0);
+  mesh::Mesh mesh(
+    xN_fine, yN_fine, xN_course, yN_course, bounds, bounds, bounds, bounds);
+
+  // Construct mesh given vector of elements
+  mesh.constructMesh(elements);
+
+  auto F = mesh.constructF();
+  for (size_t i = 0; i < 10; i++) {
+    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+  }
+  for (size_t i = 10; i < 20; i++) {
+    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+  }
+  for (size_t i = 20; i < 30; i++) {
+    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+  }
+  for (size_t i = mesh.getSize() - 20; i < mesh.getSize(); i++) {
+    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+  }
+}
+
 TEST_MAIN();

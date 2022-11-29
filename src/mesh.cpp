@@ -98,11 +98,25 @@ void Mesh::changeMaterail(const std::size_t& id, const double& new_value,
 
 xt::xarray<double> Mesh::constructF()
 {
-  // Allocate space
+  // Allocate space for fission operator
   std::vector<size_t> mesh_shape = {getSize(), getSize()};
   xt::xarray<double> F(mesh_shape);
 
+  // Fill diagonal array
+  for (size_t i = 0; i < _fine_grid.shape(0); i++) {
+    for (size_t j = 0; j < _fine_grid.shape(1); j++) {
+      // Convert 2D idx to 1D idx assuming row major ordering
+      size_t position = ravelIDX(i, j);
+      // Fill diagonal
+      F(position, position) = _fine_grid(i, j).getMaterial().getNuFission();
+    }
+  }
+
   return F;
+}
+
+size_t Mesh::ravelIDX(const size_t& i, const size_t& j) {
+  return j + i * getXN();
 }
 
 xt::xarray<double> Mesh::constructM()
