@@ -36,14 +36,15 @@ xt::xarray<MeshElement> Mesh::constructCourseGrid(
     }
   }
 
+  // Check the adjacent lengths of MeshElements are the same
+  assert(checkSharedLengths(course_grid));
+
   return course_grid;
 }
 
 xt::xarray<MeshElement> Mesh::constructFineGrid(
   const xt::xarray<MeshElement>& course_grid)
 {
-  // Check the adjacent lengths of MeshElements are the same
-  assert(checkSharedLengths(course_grid));
 
   // Allocate space
   xt::xarray<MeshElement> fine_grid({getYN(), getXN()});
@@ -87,9 +88,27 @@ xt::xarray<MeshElement> Mesh::constructFineGrid(
 
 bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
 {
-  bool shared_lengths = true;
-
-  return shared_lengths;
+  
+  // Checking if ly is correct in each row
+  for (size_t i = 0; i < course_grid.shape(0); i++) {
+    auto row = xt::row(course_grid, i);
+    for (int j = 1; j < course_grid.shape(0); j++) {
+      if (row(j - 1).getLY() != row(j).getLY()) {
+        return false;
+      }
+    }
+  }
+  // checking if lx is correct in each column
+  for (size_t i = 0; i < course_grid.shape(1); i++) {
+    auto col = xt::col(course_grid, i);
+    for (int j = 1; j < course_grid.shape(1); j++) {
+      if (col(j - 1).getLX() != col(j).getLX()) {
+        return false;
+      }
+    }
+  }
+  // if each column and row have the same lx and ly respectively the check is complete
+  return true;
 }
 
 void Mesh::changeMaterail(const std::size_t& id, const double& new_value,
@@ -115,7 +134,8 @@ xt::xarray<double> Mesh::constructF()
   return F;
 }
 
-size_t Mesh::ravelIDX(const size_t& i, const size_t& j) {
+size_t Mesh::ravelIDX(const size_t& i, const size_t& j)
+{
   return j + i * getXN();
 }
 
