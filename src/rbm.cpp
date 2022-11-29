@@ -5,11 +5,11 @@
 
 namespace rbm {
 
-void RBM::pcaReduce(
+void Perturb::pcaReduce(
   xt::xarray<double>& training_fluxes, xt::xarray<double>& training_k)
 {}
 
-xt::xarray<double> RBM::constructF_t(
+xt::xarray<double> Perturb::constructF_t(
   const xt::xarray<double>& F, const xt::xarray<double>& training_fluxes)
 {
   // Initialize F_t and allocate space
@@ -30,7 +30,7 @@ xt::xarray<double> RBM::constructF_t(
   return F_t;
 }
 
-xt::xarray<double> RBM::constructM_t(
+xt::xarray<double> Perturb::constructM_t(
   const xt::xarray<double>& M, const xt::xarray<double>& training_fluxes)
 {
   // Initialize M_t and allocate space
@@ -51,13 +51,13 @@ xt::xarray<double> RBM::constructM_t(
   return M_t;
 }
 
-void PerturbAbsorption::initialize(
-  xt::xarray<double>& training_points, mesh::Mesh& mesh, int& element_id)
+void Perturb::initialize(
+  xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id)
 {}
 
-void PerturbAbsorption::train() {}
+void Perturb::train() {}
 
-std::pair<xt::xarray<double>, double> PerturbAbsorption::calcTarget(
+std::pair<xt::xarray<double>, double> Perturb::calcTarget(
   double target_value)
 {
   xt::xarray<double> target_flux =

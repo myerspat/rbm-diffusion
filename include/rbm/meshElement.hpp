@@ -41,8 +41,11 @@ public:
 
   //=========================================================================================
   // Setters
-  // TODO: add function call to material function to change perturbation target
-  // parameter value
+  void setParameter(
+    const double& new_value, const rbm::Parameter& target_parameter)
+  {
+    _mat.setParameter(new_value, target_parameter);
+  };
 
 private:
   //=========================================================================================

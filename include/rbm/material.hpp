@@ -1,6 +1,7 @@
 #ifndef _MATERIAL_
 #define _MATERIAL_
 
+#include "rbm/rbmEnums.hpp"
 #include <string>
 
 class Material {
@@ -26,9 +27,9 @@ public:
 
   //========================================================================
   // Setters
-  void setAbsorption(double& value) { _absorption = value; };
-  void setNuFission(double& value) { _nu_fission = value; };
-  void setD(double& value) { _D = value; };
+  // Set the value of a target_parameter
+  void setParameter(
+    const double& new_value, const rbm::Parameter& target_parameter);
 
 private:
   //========================================================================
