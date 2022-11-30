@@ -68,7 +68,7 @@ void Perturb::train()
 
   for (size_t i = 0; i < _training_points.shape(0); i++) {
     // set parameter
-    _mesh.changeMaterail(_element_id, _training_points(i), _target_parameter);
+    _mesh.changeMaterial(_element_id, _training_points(i), _target_parameter);
     // find F and M matrices
     xt::xarray<double> F = _mesh.constructF(); //(nxn)
     xt::xarray<double> M = _mesh.constructM(); //(nxn)

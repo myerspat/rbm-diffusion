@@ -83,8 +83,8 @@ public:
   // Get the number of total bins in the mesh
   size_t getSize() const { return getXN() * getYN(); };
 
-  xt::xarray<MeshElement> getCourseGrid(){ return _course_grid; }
-  xt::xarray<MeshElement> getFineGrid(){ return _fine_grid; }
+  xt::xarray<MeshElement> getCourseGrid() { return _course_grid; }
+  xt::xarray<MeshElement> getFineGrid() { return _fine_grid; }
 };
 
 } // namespace mesh
