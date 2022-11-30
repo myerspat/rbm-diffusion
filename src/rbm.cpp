@@ -59,7 +59,10 @@ void Perturb::initialize(
 
 void Perturb::train()
 {
-  // full training_fluxes and training_k (which is 1/egienvalue)
+  // Prompt user of training begun
+  printf("Begin training\n\n");
+
+  // full training_fluxes and training_k
   xt::xarray<double> training_fluxes = xt::xarray<double>::from_shape(
     {_mesh.getSize(), _training_points.shape(0)});
 
@@ -69,14 +72,20 @@ void Perturb::train()
   for (size_t i = 0; i < _training_points.shape(0); i++) {
     // set parameter
     _mesh.changeMaterail(_element_id, _training_points(i), _target_parameter);
+
     // find F and M matrices
     xt::xarray<double> F = _mesh.constructF(); //(nxn)
     xt::xarray<double> M = _mesh.constructM(); //(nxn)
+
     // find eigenvalues and eigenvectors
     xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M), F);
-    auto eigenfunction = xt::linalg::eig(A);
-    training_k(i) = 1 / (std::get<0>(eigenfunction)(0).real());
-    xt::col(training_fluxes, i) = std::get<1>(eigenfunction)(0).real();
+    auto [eigenvalues, eigenvectors] = xt::linalg::eig(A);
+    training_k(i) = eigenvalues(0).real();
+    xt::col(training_fluxes, i) = xt::abs(xt::real(xt::col(eigenvectors, 0)));
+
+    // Update user
+    printf("Point %lu = %lg => k = %6lg\n", i + 1, _training_points(i),
+      _training_k(i));
   }
 
   // reduce to PxP
