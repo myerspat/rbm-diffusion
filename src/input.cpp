@@ -174,8 +174,7 @@ rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
   rbm::Perturb perturb(training_points, mesh, element_id, target_parameter);
 
   // Determine number of PCAs to preserve, default is 3
-  auto attr = training_node.attribute("pcas");
-  if (attr) {
+   if (auto attr = training_node.attribute("pcas")) {
     perturb.setNumPCs(attr.as_int());
   }
 
