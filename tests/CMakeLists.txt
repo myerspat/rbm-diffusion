@@ -27,6 +27,7 @@ endforeach()
 # Regression tests
 set(TEST_FILES
   test_1D_mesh
+  test_2D_mesh
 )
 
 # For each test in TEST_FILES
