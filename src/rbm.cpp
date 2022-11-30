@@ -120,7 +120,7 @@ void Perturb::train()
 
   for (size_t i = 0; i < _training_points.shape(0); i++) {
     // set parameter
-    _mesh.changeMaterail(_element_id, _training_points(i), _target_parameter);
+    _mesh.changeMaterial(_element_id, _training_points(i), _target_parameter);
     // find F and M matrices
     xt::xarray<double> F = _mesh.constructF(); //(nxn)
     xt::xarray<double> M = _mesh.constructM(); //(nxn)
@@ -135,14 +135,13 @@ void Perturb::train()
   pcaReduce(training_fluxes);
 }
 
-std::pair<xt::xarray<double>, double> Perturb::calcTarget(
-  double target_value)
+std::pair<xt::xarray<double>, double> Perturb::calcTarget(double target_value)
 {
   xt::xarray<double> target_flux =
     xt::xarray<double>::from_shape({_mesh.getSize()});
   double target_k;
   // change with specific parameter
-  _mesh.changeMaterail(_element_id, target_value,_target_parameter);
+  _mesh.changeMaterial(_element_id, target_value, _target_parameter);
   // get F and M matricies
   xt::xarray<double> F = _mesh.constructF(); //(nxn)
   xt::xarray<double> M = _mesh.constructM(); //(nxn)

@@ -277,4 +277,83 @@ TEST(test_CheckSharedLengths)
   ASSERT_TRUE(mesh.checkSharedLengths(course_grid_bad_in_ly) == false);
 }
 
+TEST(test_changeMaterial_course_and_fine)
+{
+
+  // Initialize materials
+  Material fuel("fuel", 0.10, 0.11, 2.0);
+  Material reflector("reflector", 0.01, 0.0, 1.5);
+
+  // Lengths
+  double lx_0 = 30.0;
+  double ly_0 = 30.0;
+  double lx_1 = 10.0;
+  double ly_1 = 10.0;
+
+  // Create mesh elements
+  // Fuel region
+  size_t id_0 = 0;
+  mesh::MeshElement e_1(
+    fuel, lx_0, ly_0, id_0, std::make_pair(0, 0), std::make_pair(0, 0));
+
+  // Reflector region
+  size_t id_1 = 1;
+  mesh::MeshElement e_2(
+    reflector, lx_1, ly_0, id_1, std::make_pair(0, 0), std::make_pair(1, 1));
+  mesh::MeshElement e_3(
+    reflector, lx_0, ly_1, id_1, std::make_pair(1, 1), std::make_pair(0, 0));
+  mesh::MeshElement e_4(
+    reflector, lx_1, ly_1, id_1, std::make_pair(1, 1), std::make_pair(1, 1));
+
+  
+  // Elements vector
+  std::vector<mesh::MeshElement> elements = {e_1, e_2, e_3, e_4};
+
+
+  // Initialize mesh
+  size_t xN_fine = 2;
+  size_t yN_fine = 2;
+  size_t xN_course = 2;
+  size_t yN_course = 2;
+  std::pair<double, double> bounds = std::make_pair(0.0, 1.0);
+  mesh::Mesh mesh(
+    xN_fine, yN_fine, xN_course, yN_course, bounds, bounds, bounds, bounds);
+  
+ // Construct course and fine Grid 
+  mesh.constructMesh(elements);
+
+  // Changing material in course grid
+  int id = 1;
+  double new_value = 0.210;
+  rbm::Parameter target_parameter = rbm::Parameter::absorption;
+  mesh.changeMaterial(id, new_value, target_parameter);
+  xt::xarray<mesh::MeshElement> my_course_grid = mesh.getCourseGrid();
+
+  // checking if absorption change on id = 1 worked
+  double check_course_grid[2][2] = { {0.10, 0.210}, {0.210, 0.210}};// course grid info with change in material information
+  for(int i = 0; i < 2; i++){
+    for(int j = 0; j < 2; j++){
+      ASSERT_TRUE(my_course_grid.at(i, j).getMaterial().getAbsorption() == check_course_grid[i][j]);
+     }
+  }
+  
+  // Checking material in fine grid also changed
+  auto my_fine_grid = mesh.getFineGrid();
+  double check_fine_grid[4][4] = { {0.10, 0.10, 0.210, 0.210}, 
+                                   {0.10, 0.10, 0.210, 0.210}, 
+                                   {0.210, 0.210, 0.210, 0.210},
+                                   {0.210, 0.210, 0.210, 0.210}};
+  
+
+  std::cout << my_fine_grid.at(0, 3).getMaterial().getAbsorption() << "  | | | ";
+  ASSERT_TRUE(my_fine_grid.at(0, 3).getMaterial().getAbsorption() == 0.210);
+
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < 4; j++){
+      ASSERT_TRUE(my_fine_grid.at(i, j).getMaterial().getAbsorption() == check_fine_grid[i][j]);
+     }
+  }
+
+}
+
 TEST_MAIN();
