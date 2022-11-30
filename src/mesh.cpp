@@ -88,7 +88,7 @@ xt::xarray<MeshElement> Mesh::constructFineGrid(
 
 bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
 {
-  
+
   // Checking if ly is correct in each row
   for (size_t i = 0; i < course_grid.shape(0); i++) {
     auto row = xt::row(course_grid, i);
@@ -107,13 +107,26 @@ bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
       }
     }
   }
-  // if each column and row have the same lx and ly respectively the check is complete
+  // if each column and row have the same lx and ly respectively the check is
+  // complete
   return true;
 }
 
-void Mesh::changeMaterail(const std::size_t& id, const double& new_value,
+void Mesh::changeMaterial(const std::size_t& id, const double& new_value,
   const rbm::Parameter& target_parameter)
-{}
+{
+  // Iterating over the course mesh and changingg the value needed for a
+  // specific id
+  for (size_t i = 0; i < _course_grid.shape(0); i++) {
+    for (size_t j = 0; j < _course_grid.shape(1); j++) {
+      if (_course_grid.at(i, j).getID() == id) {
+        _course_grid.at(i, j).setParameter(new_value, target_parameter);
+      }
+    }
+  }
+  // After reconstructing the course grid the fine mesh must be reconstructed.
+  _fine_grid = constructFineGrid(_course_grid);
+}
 
 xt::xarray<double> Mesh::constructF()
 {

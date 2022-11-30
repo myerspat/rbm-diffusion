@@ -63,12 +63,12 @@ public:
   bool checkSharedLengths(const xt::xarray<MeshElement>& course_grid);
 
   // Change target mesh elements' material property
-  void changeMaterail(const std::size_t& id, const double& new_value,
+  void changeMaterial(const std::size_t& id, const double& new_value,
     const rbm::Parameter& target_parameter);
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
-  
+
   // Assuming row major ordering, returns 1D idx given 2D idx
   size_t ravelIDX(const size_t& i, const size_t& j);
 
@@ -81,7 +81,10 @@ public:
   size_t getYN() const { return _yN_fine * _yN_course; };
 
   // Get the number of total bins in the mesh
-  size_t getSize() { return getXN() * getYN(); };
+  size_t getSize() const { return getXN() * getYN(); };
+
+  xt::xarray<MeshElement> getCourseGrid(){ return _course_grid; }
+  xt::xarray<MeshElement> getFineGrid(){ return _fine_grid; }
 };
 
 } // namespace mesh

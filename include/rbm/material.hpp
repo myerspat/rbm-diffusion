@@ -4,11 +4,19 @@
 #include "rbm/rbmEnums.hpp"
 #include <string>
 
+/**
+ * @file material.cpp
+ * Material: Object that stores the material properties of a given structure ie
+ * reflector, control rod, fuel, etc.
+ *
+ */
 class Material {
 public:
   //========================================================================
   // Constructor / Destructor
+
   Material() {};
+  /// Constructor of the Material class.
   Material(const std::string& name, const double& absorption,
     const double& nu_fission, const double& D)
     : _name(name), _absorption(absorption), _nu_fission(nu_fission), _D(D) {};
