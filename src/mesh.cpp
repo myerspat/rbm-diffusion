@@ -106,8 +106,11 @@ xt::xarray<double> Mesh::constructF()
     for (size_t j = 0; j < _fine_grid.shape(1); j++) {
       // Convert 2D idx to 1D idx assuming row major ordering
       size_t position = ravelIDX(i, j);
+
       // Fill diagonal
-      F(position, position) = _fine_grid(i, j).getMaterial().getNuFission();
+      F(position, position) = _fine_grid(i, j).getMaterial().getNuFission() *
+                              _fine_grid(i, j).getLX() / _xN_fine *
+                              _fine_grid(i, j).getLY() / _yN_fine;
     }
   }
 
