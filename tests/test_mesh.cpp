@@ -213,7 +213,6 @@ TEST(test_CheckSharedLengths)
     reflector, lx_1, ly_1, id_1, std::make_pair(1, 1), std::make_pair(1, 1));
 
   // Create course grid
-  std::vector<mesh::MeshElement> elements = {e_1, e_2, e_3, e_4};
   xt::xarray<mesh::MeshElement> course_grid = {{e_1, e_2}, {e_3, e_4}};
 
   // Initialize mesh
