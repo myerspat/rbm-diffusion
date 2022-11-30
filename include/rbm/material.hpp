@@ -4,12 +4,6 @@
 #include "rbm/rbmEnums.hpp"
 #include <string>
 
-/**
- * @file material.cpp
- * Material: Object that stores the material properties of a given structure ie
- * reflector, control rod, fuel, etc.
- *
- */
 class Material {
 public:
   //========================================================================
