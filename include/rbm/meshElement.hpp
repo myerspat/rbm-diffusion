@@ -17,14 +17,13 @@ public:
     const std::pair<std::size_t, std::size_t>& idx_col)
     : _idx_row(idx_row), _idx_col(idx_col), _lx(lx), _ly(ly), _id(id), _mat(mat)
   {
-    assert(checkIndexing());
+    assert(checkIndexing(idx_row, idx_col));
   };
 
   //=========================================================================================
   // Methods
-  bool checkIndexing();
-
-  //=========================================================================================
+bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std::pair<std::size_t, std::size_t>& idx_col);
+//=========================================================================================
   // Getters
   const Material& getMaterial() const { return _mat; };
   const std::size_t& getID() const { return _id; };
