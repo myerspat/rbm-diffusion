@@ -132,7 +132,7 @@ void Perturb::train()
   }
 
   // reduce to PxP
-  pcaReduce(training_fluxes, training_k);
+  pcaReduce(training_fluxes);
 }
 
 std::pair<xt::xarray<double>, double> Perturb::calcTarget(double target_value)

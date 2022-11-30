@@ -11,8 +11,8 @@ public:
   //=============================================================
   // Constructors / Destructor
   Perturb() {};
-  Perturb(xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id,
-    Parameter target_parameter)
+  Perturb(xt::xarray<double>& training_points, mesh::Mesh& mesh,
+    size_t& element_id, Parameter target_parameter)
     : _training_points(training_points), _mesh(mesh), _element_id(element_id),
       _target_parameter(target_parameter) {};
 
@@ -50,7 +50,7 @@ private:
   xt::xarray<double> _training_k;      // 1D array of training k
   mesh::Mesh _mesh;                    // Mesh for the problem
   size_t _num_pcs = 3; // number of PCs to keep when reducing, defualts to 3
-  size_t _element_id;             // Element within mesh that will be perturbed
+  size_t _element_id;  // Element within mesh that will be perturbed
   Parameter _target_parameter; // Perturbed parameter type (absorption, D,
                                // nu_fission)
 };
