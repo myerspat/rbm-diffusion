@@ -40,7 +40,6 @@ list(APPEND rbm_SOURCES
   src/material.cpp
   src/meshElement.cpp
   src/rbm.cpp
-  src/main.cpp
 )
 
 # Archived source files
@@ -120,6 +119,10 @@ include(cmake/FindOpenBLAS.cmake)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rbm-diffusion")
 target_include_directories(rbm PRIVATE ${CMAKE_BINARY_DIR}/include)
 target_link_libraries(rbm xtensor xtensor-blas pugixml ${OPENBLAS_LIB})
+
+# Main executable
+add_executable(rbm-diffusion src/main.cpp)
+target_link_libraries(rbm-diffusion rbm)
 
 #================================================================================
 # CTest and subdirectories

@@ -57,6 +57,13 @@ std::vector<T> parseString(const pugi::xml_node& node, const std::string& value,
   // Grab a string of the child values
   std::string node_text = node.child_value(value.c_str());
 
+  // If the values vector is empty
+  if (node_text.empty()) {
+    // If the vector is empty throw an error
+    throw std::runtime_error(
+      "No values were found within " + value + " node in " + node.name());
+  }
+
   // Initialize token, node_values, and pos
   std::string token;
   std::vector<T> node_values;
@@ -79,23 +86,15 @@ std::vector<T> parseString(const pugi::xml_node& node, const std::string& value,
     node_text.erase(0, pos + delimiter.length());
   }
 
-  // If the values vector is empty
-  if (node_values.empty()) {
-    // If the string is not empty
-    if (!node_text.empty()) {
-      // Add values based on type
-      if constexpr (std::is_same_v<T, double>)
-        node_values.push_back(std::stod(node_text));
-      else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, size_t>)
-        node_values.push_back(std::stoi(node_text));
-      else if constexpr (std::is_same_v<T, std::string>)
-        node_values.push_back(token);
-
-    } else {
-      // If the vector is empty throw an error
-      throw std::runtime_error(
-        "No values were found within " + value + " node in " + node.name());
-    }
+  // Add the last value
+  if (!node_text.empty()) {
+    // Add values based on type
+    if constexpr (std::is_same_v<T, double>)
+      node_values.push_back(std::stod(node_text));
+    else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, size_t>)
+      node_values.push_back(std::stoi(node_text));
+    else if constexpr (std::is_same_v<T, std::string>)
+      node_values.push_back(token);
   }
 
   return node_values;
