@@ -1,6 +1,7 @@
 #include "rbm/input.hpp"
 #include "rbm/material.hpp"
 #include <algorithm>
+#include <cstdio>
 #include <pugixml.hpp>
 #include <stdexcept>
 #include <utility>
@@ -54,6 +55,9 @@ std::vector<Material> parseMaterialsNode(const pugi::xml_node& root)
 
 mesh::Mesh parseMeshNode(const pugi::xml_node& root)
 {
+  // Notify user of parsing
+  std::cout << "\n   Parsing mesh XML node\n";
+
   // Get material node
   std::vector<Material> materials = util::parseMaterialsNode(root);
 
@@ -74,6 +78,9 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
   size_t course_y_bins =
     util::getAttribute<size_t>(cartesian_mesh_node, "course_y_bins");
 
+  std::cout << "     Total x bins = " << fine_x_bins * course_x_bins
+            << ", Total y bins = " << fine_y_bins * course_y_bins << std::endl;
+
   // Get boundary conditions
   std::vector<std::string> sides = {"left", "right", "top", "bottom"};
   std::vector<std::pair<double, double>> bounds;
@@ -84,6 +91,10 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
     pugi::xml_node bound_node = util::getNode(mesh_node, side + "_condition");
     bounds.emplace_back(util::getAttribute<double>(bound_node, "a"),
       util::getAttribute<double>(bound_node, "b"));
+
+    // Print bound
+    std::cout << "     " + side + " bound: a = " << bounds.back().first
+              << ", b = " << bounds.back().second << std::endl;
   }
 
   // Initialize mesh
@@ -132,6 +143,9 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
   }
   elements.shrink_to_fit();
 
+  std::cout << "     Number of course mesh elements = " << elements.size()
+            << std::endl;
+
   // Construct mesh with mesh elements
   mesh.constructMesh(elements);
 
@@ -140,11 +154,17 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
 
 rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
 {
+  // Notify parsing of rbm node
+  std::cout << "\n   Parsing rbm XML node\n";
+
   // Get rbm node
   pugi::xml_node rbm_node = util::getNode(root, "rbm");
 
   // Get training node
   pugi::xml_node training_node = util::getNode(rbm_node, "training");
+
+  // Get target node
+  pugi::xml_node target_node = util::getNode(rbm_node, "target");
 
   // Get cell id that will be perturbed
   size_t element_id = util::getAttribute<int>(training_node, "element_id");
@@ -166,21 +186,46 @@ rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
                              ") is not absorption, nu_fission, or D");
   }
 
+  // Print target parameter and ID of elements to be perturbed
+  std::cout << "     Target parameter: " + parameter << std::endl;
+  std::cout << "     Perturbing elements of ID = " << element_id << std::endl;
+
   // Parse training fluxes
   xt::xarray<double> training_points =
     xt::adapt(util::parseString<double>(training_node, "values"));
 
+  // Print number of training points
+  std::cout << "     Number of training points = " << training_points.size()
+            << std::endl;
+
+  // Parse target points
+  xt::xarray<double> target_points =
+    xt::adapt(util::parseString<double>(target_node, "values"));
+
   // Create Purturb object
-  rbm::Perturb perturb(training_points, mesh, element_id, target_parameter);
+  rbm::Perturb perturb(
+    training_points, target_points, mesh, element_id, target_parameter);
 
   // Determine number of PCAs to preserve, default is 3
+  size_t num_pcs = 3;
   if (auto attr = training_node.attribute("pcas")) {
     perturb.setNumPCs(attr.as_int());
+    num_pcs = attr.as_int();
+
   } else if (training_points.shape(0) < 3) {
     // If the number of training points given is less than the default (3)
     // reduce number of PCs kept
     perturb.setNumPCs(training_points.shape(0));
+    num_pcs = training_points.shape(0);
   }
+
+  // Print size of subspace
+  std::cout << "     Reduced number of training points = " << num_pcs
+            << std::endl;
+
+  // Print number of target points
+  std::cout << "     Number of target points = " << target_points.size()
+            << std::endl;
 
   return perturb;
 }
