@@ -50,6 +50,14 @@ public:
   // Set the number of PCs to keep in reduction
   void setNumPCs(const size_t num_pcs) { _num_pcs = num_pcs; }
 
+  // Write data to file_name
+  void writePointData(const std::string& file_name,
+    const xt::xarray<double>& points, const xt::xarray<double>& k,
+    const xt::xarray<double>& fluxes);
+
+  // Write PCA data to reduced.csv
+  void writePCAData();
+
   //=============================================================
   // Getters
   const size_t getNumTraining() const { return _training_points.size(); };
@@ -64,6 +72,7 @@ private:
   xt::xarray<double> _target_points;   // 1D array of target parameter values
   xt::xarray<double> _target_fluxes;   // 2D array of target fluxes
   xt::xarray<double> _target_k;        // 2D array of target k
+  xt::xarray<double> _variance;        // Variance of PCA data
   mesh::Mesh _mesh;                    // Mesh for the problem
   size_t _num_pcs = 3; // number of PCs to keep when reducing, defualts to 3
   size_t _element_id;  // Element within mesh that will be perturbed

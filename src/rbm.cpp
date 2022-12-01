@@ -1,10 +1,14 @@
 #include "rbm/rbm.hpp"
+#include "xtensor/xcsv.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xtensor_forward.hpp"
 #include <cstdio>
+#include <fstream>
+#include <iomanip>
 #include <tuple>
 #include <utility>
 #include <xtensor-blas/xlinalg.hpp>
+#include <xtensor/xio.hpp>
 #include <xtensor/xnorm.hpp>
 #include <xtensor/xview.hpp>
 
@@ -30,19 +34,25 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
   // rank x rank
   U = xt::view(U, xt::all(), xt::range(0, rank));
 
+  // Variance
+  _variance = xt::square(L) / (training_fluxes.shape(0) - 1);
+
   // Calculate total variance
-  double total_variance = xt::sum(xt::square(L))(0);
+  double total_variance = xt::sum(_variance)(0);
+
+  // Variance
+  _variance = xt::square(L) / (training_fluxes.shape(0) - 1);
 
   // Reduce subspace to the first PCs to _num_pcs
   double var = 0.0;
   for (size_t i = 0; i < _num_pcs; i++) {
-    var += (L(i) * L(i));
+    var += _variance(i);
   }
 
   // Throw warning if the number of PCs preserved is less than 90% of the total
   // variance
   if (var < 0.9 * total_variance) {
-    printf("Warning: Subspace was reduced to %lu PCs which has only %lg "
+    printf("\n Warning: Subspace was reduced to %lu PCs which has only %lg "
            "percent of the total variance\n",
       _num_pcs, var / total_variance * 100);
   }
@@ -62,6 +72,12 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
     auto center = xt::view(training_fluxes, i, xt::all());
     center += col_means;
   }
+
+  // Normalize to 1
+  training_fluxes /= xt::norm_l2(training_fluxes);
+
+  // Write PCA data
+  writePCAData();
 }
 
 xt::xarray<double> Perturb::constructF_t(
@@ -159,6 +175,10 @@ void Perturb::train()
       _training_k(i));
   }
 
+  // Write training data to csv file
+  writePointData(
+    "training.csv", _training_points, _training_k, _training_fluxes);
+
   // reduce to PxP
   pcaReduce(_training_fluxes);
 }
@@ -209,6 +229,9 @@ void Perturb::calcTargets()
     printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _target_points(i),
       _target_k(i));
   }
+
+  // Write target data
+  writePointData("target.csv", _target_points, _target_k, _target_fluxes);
 }
 
 void Perturb::checkError()
@@ -247,6 +270,72 @@ void Perturb::checkError()
       "   Point %lu = %3lg => k_exact = %6lg, k_rbm = %6lg, error = %6lg\n",
       i + 1, _target_points(i), exact_target_k(i), _target_k(i), error(i));
   }
+
+  // Print data
+  writePointData("error.csv", error, exact_target_k, exact_target_fluxes);
+}
+
+void Perturb::writePointData(const std::string& file_name,
+  const xt::xarray<double>& points, const xt::xarray<double>& k,
+  const xt::xarray<double>& fluxes)
+{
+  std::cout << "\n Writing data to " + file_name + "\n";
+
+  // Open file
+  std::ofstream file;
+  file.open(file_name);
+
+  // Printing point data
+  file << std::setprecision(12) << points(0);
+  for (size_t i = 1; i < points.size(); i++) {
+    file << "," << std::setprecision(12) << points(i);
+  }
+  file << std::endl;
+
+  // Printing eigenvalue data
+  file << std::setprecision(12) << k(0);
+  for (size_t i = 1; i < k.size(); i++) {
+    file << "," << std::setprecision(12) << k(i);
+  }
+  file << std::endl;
+
+  // Printing flux data
+  for (size_t i = 0; i < fluxes.shape(0); i++) {
+    file << std::setprecision(12) << fluxes(i, 0);
+    for (size_t j = 1; j < fluxes.shape(1); j++) {
+      file << "," << std::setprecision(12) << fluxes(i, j);
+    }
+    file << std::endl;
+  }
+
+  file.close();
+}
+
+void Perturb::writePCAData()
+{
+  std::cout << " Writing data to reduced.csv\n";
+
+  // Open file
+  std::ofstream file;
+  file.open("reduced.csv");
+
+  // Printing variance data
+  file << std::setprecision(12) << _variance(0);
+  for (size_t i = 1; i < _variance.size(); i++) {
+    file << "," << std::setprecision(12) << _variance(i);
+  }
+  file << std::endl;
+
+  // Printing flux data
+  for (size_t i = 0; i < _training_fluxes.shape(0); i++) {
+    file << std::setprecision(12) << _training_fluxes(i, 0);
+    for (size_t j = 1; j < _training_fluxes.shape(1); j++) {
+      file << "," << std::setprecision(12) << _training_fluxes(i, j);
+    }
+    file << std::endl;
+  }
+
+  file.close();
 }
 
 } // namespace rbm
