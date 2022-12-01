@@ -5,6 +5,7 @@
 #include <tuple>
 #include <utility>
 #include <xtensor-blas/xlinalg.hpp>
+#include <xtensor/xnorm.hpp>
 #include <xtensor/xview.hpp>
 
 namespace rbm {
@@ -168,7 +169,7 @@ void Perturb::calcTargets()
   printf("\n Calculating Targets\n");
 
   _target_fluxes =
-    xt::xarray<double>::from_shape({_training_fluxes.shape(1), _target_points.size()});
+    xt::zeros<double>({_training_fluxes.shape(0), _target_points.size()});
   _target_k = xt::xarray<double>::from_shape({_target_points.size()});
 
   for (size_t i = 0; i < _target_points.size(); i++) {
@@ -180,9 +181,8 @@ void Perturb::calcTargets()
     xt::xarray<double> M = _mesh.constructM(); //(nxn)
 
     // get F_t and M_t
-    rbm::Perturb object;
-    xt::xarray<double> F_t = object.constructF_t(F, _training_fluxes);
-    xt::xarray<double> M_t = object.constructM_t(M, _training_fluxes);
+    xt::xarray<double> F_t = constructF_t(F, _training_fluxes);
+    xt::xarray<double> M_t = constructM_t(M, _training_fluxes);
 
     // calculate the eigenvlue and eigenvector for target
     xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M_t), F_t);
@@ -192,8 +192,18 @@ void Perturb::calcTargets()
     auto fundamental =
       findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
 
+    // Get target eigenvalue
     _target_k(i) = fundamental.first;
-    xt::col(_target_fluxes, i) = fundamental.second;
+
+    // Calculate approximate target flux using the sum of ritz vector *
+    // _training_fluxes
+    for (size_t j = 0; j < _training_points.size(); j++) {
+      xt::col(_target_fluxes, i) +=
+        fundamental.second(j) * xt::col(_training_fluxes, j);
+    }
+
+    // Normlize target fluxes
+    xt::col(_target_fluxes, i) /= xt::norm_l2(xt::col(_target_fluxes, i));
 
     // Update user
     printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _target_points(i),
