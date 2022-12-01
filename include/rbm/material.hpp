@@ -20,9 +20,9 @@ public:
   ///
   /// @param name is the name of the structure being created
   ///             Example: Fuel or Reflector
-  /// @param absorption is the absorption macroscopic crosssection for a given
+  /// @param absorption is the absorption macroscopic cross section for a given
   /// structure
-  /// @param nu_fission is the fission macroscopic crosssections for a given
+  /// @param nu_fission is the fission macroscopic cross sections for a given
   /// structure
   /// @param D is the diffusion coefficient
   /// @returns Reinitializes the private variables with their respective
