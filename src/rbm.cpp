@@ -67,8 +67,8 @@ xt::xarray<double> Perturb::constructF_t(
   const xt::xarray<double>& F, const xt::xarray<double>& training_fluxes)
 {
   // Initialize F_t and allocate space
-  xt::xarray<double> F_t = xt::xarray<double>::from_shape(
-    {training_fluxes.shape(1), training_fluxes.shape(1)});
+  xt::xarray<double> F_t =
+    xt::zeros<double>({training_fluxes.shape(1), training_fluxes.shape(1)});
 
   for (size_t i = 0; i < training_fluxes.shape(1); i++) {
     // Get flux at i
@@ -88,8 +88,8 @@ xt::xarray<double> Perturb::constructM_t(
   const xt::xarray<double>& M, const xt::xarray<double>& training_fluxes)
 {
   // Initialize M_t and allocate space
-  xt::xarray<double> M_t = xt::xarray<double>::from_shape(
-    {training_fluxes.shape(1), training_fluxes.shape(1)});
+  xt::xarray<double> M_t =
+    xt::zeros<double>({training_fluxes.shape(1), training_fluxes.shape(1)});
 
   for (size_t i = 0; i < training_fluxes.shape(1); i++) {
     // Get flux at i
@@ -109,17 +109,30 @@ void Perturb::initialize(
   xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id)
 {}
 
+std::pair<double, xt::xarray<double>> Perturb::findMaxEigen(
+  xt::xarray<double> eigenvalues, xt::xarray<double> eigenvectors)
+{
+  size_t idx = 0;
+  double max_eigenvalue = 0.0;
+  for (size_t i = 0; i < eigenvalues.size(); i++) {
+    if (eigenvalues(i) > max_eigenvalue) {
+      max_eigenvalue = eigenvalues(i);
+      idx = i;
+    }
+  }
+
+  return std::make_pair(eigenvalues(idx), xt::abs(xt::col(eigenvectors, idx)));
+}
+
 void Perturb::train()
 {
   // Prompt user of training begun
-  printf("Begin training\n\n");
+  printf("\n Begin training\n");
 
   // full training_fluxes and training_k
-  xt::xarray<double> training_fluxes = xt::xarray<double>::from_shape(
+  _training_fluxes = xt::xarray<double>::from_shape(
     {_mesh.getSize(), _training_points.shape(0)});
-
-  xt::xarray<double> training_k =
-    xt::xarray<double>::from_shape({_training_points.shape(0)});
+  _training_k = xt::xarray<double>::from_shape({_training_points.shape(0)});
 
   for (size_t i = 0; i < _training_points.shape(0); i++) {
     // set parameter
@@ -132,39 +145,98 @@ void Perturb::train()
     // find eigenvalues and eigenvectors
     xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M), F);
     auto [eigenvalues, eigenvectors] = xt::linalg::eig(A);
-    training_k(i) = eigenvalues(0).real();
-    xt::col(training_fluxes, i) = xt::abs(xt::real(xt::col(eigenvectors, 0)));
+
+    // Find max eigenvalue corresponding eigenvector
+    auto fundamental =
+      findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
+
+    _training_k(i) = fundamental.first;
+    xt::col(_training_fluxes, i) = fundamental.second;
 
     // Update user
-    printf("Point %lu = %lg => k = %6lg\n", i + 1, _training_points(i),
+    printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _training_points(i),
       _training_k(i));
   }
 
   // reduce to PxP
-  pcaReduce(training_fluxes);
+  pcaReduce(_training_fluxes);
 }
 
-std::pair<xt::xarray<double>, double> Perturb::calcTarget(double target_value)
+void Perturb::calcTargets()
 {
-  xt::xarray<double> target_flux =
-    xt::xarray<double>::from_shape({_mesh.getSize()});
-  double target_k;
-  // change with specific parameter
-  _mesh.changeMaterial(_element_id, target_value, _target_parameter);
-  // get F and M matricies
-  xt::xarray<double> F = _mesh.constructF(); //(nxn)
-  xt::xarray<double> M = _mesh.constructM(); //(nxn)
-  rbm::Perturb object;
-  // get F_t and M_t
-  xt::xarray<double> F_t = object.constructF_t(F, _training_fluxes);
-  xt::xarray<double> M_t = object.constructF_t(M, _training_fluxes);
-  // calculate the eigenvlue and eigenvector for target
-  xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M), F);
-  auto [eigenvalues, eigenvectors] = xt::linalg::eig(A);
-  target_k = eigenvalues(0).real();
-  target_flux = xt::abs(xt::real(xt::col(eigenvectors, 0)));
+  // Prompt user of online mode
+  printf("\n Calculating Targets\n");
 
-  return std::make_pair(target_flux, target_k);
+  _target_fluxes =
+    xt::xarray<double>::from_shape({_training_fluxes.shape(1), _target_points.size()});
+  _target_k = xt::xarray<double>::from_shape({_target_points.size()});
+
+  for (size_t i = 0; i < _target_points.size(); i++) {
+    // change with specific parameter
+    _mesh.changeMaterial(_element_id, _target_points(i), _target_parameter);
+
+    // get F and M matricies
+    xt::xarray<double> F = _mesh.constructF(); //(nxn)
+    xt::xarray<double> M = _mesh.constructM(); //(nxn)
+
+    // get F_t and M_t
+    rbm::Perturb object;
+    xt::xarray<double> F_t = object.constructF_t(F, _training_fluxes);
+    xt::xarray<double> M_t = object.constructM_t(M, _training_fluxes);
+
+    // calculate the eigenvlue and eigenvector for target
+    xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M_t), F_t);
+    auto [eigenvalues, eigenvectors] = xt::linalg::eig(A);
+
+    // Find max eigenvalue corresponding eigenvector
+    auto fundamental =
+      findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
+
+    _target_k(i) = fundamental.first;
+    xt::col(_target_fluxes, i) = fundamental.second;
+
+    // Update user
+    printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _target_points(i),
+      _target_k(i));
+  }
+}
+
+void Perturb::checkError()
+{
+  printf("\n Calculating Errors\n");
+
+  auto exact_target_fluxes =
+    xt::xarray<double>::from_shape({_mesh.getSize(), _target_points.size()});
+  auto exact_target_k = xt::xarray<double>::from_shape({_target_points.size()});
+  auto error = xt::xarray<double>::from_shape({_target_points.size()});
+
+  for (size_t i = 0; i < _target_points.shape(0); i++) {
+    // set parameter
+    _mesh.changeMaterial(_element_id, _target_points(i), _target_parameter);
+
+    // find F and M matrices
+    xt::xarray<double> F = _mesh.constructF(); //(nxn)
+    xt::xarray<double> M = _mesh.constructM(); //(nxn)
+
+    // find eigenvalues and eigenvectors
+    xt::xarray<double> A = xt::linalg::dot(xt::linalg::inv(M), F);
+    auto [eigenvalues, eigenvectors] = xt::linalg::eig(A);
+
+    // Find max eigenvalue corresponding eigenvector
+    auto fundamental =
+      findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
+
+    exact_target_k(i) = fundamental.first;
+    xt::col(exact_target_fluxes, i) = fundamental.second;
+
+    // Calculate relative error
+    error(i) = (exact_target_k(i) - _target_k(i)) / exact_target_k(i);
+
+    // Update user
+    printf(
+      "   Point %lu = %3lg => k_exact = %6lg, k_rbm = %6lg, error = %6lg\n",
+      i + 1, _target_points(i), exact_target_k(i), _target_k(i), error(i));
+  }
 }
 
 } // namespace rbm
