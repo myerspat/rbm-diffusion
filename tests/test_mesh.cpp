@@ -6,6 +6,55 @@
 #include <utility>
 #include <xtensor/xarray.hpp>
 
+TEST(test_constructM_1)
+{
+  // This problem tests the 1D implementation of constructM
+
+  // Initialize materials
+  Material fuel("fuel", 0.10, 0.11, 2.0);
+
+  // Lengths
+  double lx_0 = 30.0;
+  double ly_0 = 1.0;
+
+  // Create mesh elements
+  // Fuel region
+  size_t id_0 = 0;
+  mesh::MeshElement e_1(
+    fuel, lx_0, ly_0, id_0, std::make_pair(0, 0), std::make_pair(0, 0));
+
+  // Create course grid
+  std::vector<mesh::MeshElement> course_grid = {e_1};
+
+  // Initialize mesh
+  size_t xN_fine = 5;
+  size_t yN_fine = 1;
+  size_t xN_course = 1;
+  size_t yN_course = 1;
+  std::pair<double, double> bounds = std::make_pair(0, 1);
+  std::pair<double, double> left_bound = std::make_pair(0, 1);
+  std::pair<double, double> right_bound = std::make_pair(1, -2);
+
+  mesh::Mesh mesh(xN_fine, yN_fine, xN_course, yN_course, left_bound,
+    right_bound, bounds, bounds);
+
+  // Construct fine grid
+  mesh.constructMesh(course_grid);
+  auto M = mesh.constructM();
+
+  // Expected result
+  xt::xarray<double> M_expected = {{0.9333, -0.3333, 0, 0, 0},
+    {-0.3333, 1.2666, -0.3333, 0, 0}, {0, -0.3333, 1.2666, -0.3333, 0},
+    {0, 0, -0.3333, 1.2666, -0.3333}, {0, 0, 0, -0.3333, 1.2190}};
+
+  // Check each value
+  for (size_t i = 0; i < M_expected.shape(0); i++) {
+    for (size_t j = 0; j < M_expected.shape(1); j++) {
+      ASSERT_ALMOST_EQUAL(M(i, j), M_expected(i, j), 0.0001);
+    }
+  }
+}
+
 TEST(test_constructFineGrid_1)
 {
   // Initialize materials
@@ -170,18 +219,28 @@ TEST(test_constructF_1)
   // Construct mesh given vector of elements
   mesh.constructMesh(elements);
 
+  // dx and dy
+  double dx_fuel = lx_0 / xN_fine;
+  double dy_fuel = ly_0 / yN_fine;
+  double dx_reflector = lx_1 / xN_fine;
+  double dy_reflector = ly_1 / yN_fine;
+
   auto F = mesh.constructF();
   for (size_t i = 0; i < 10; i++) {
-    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+    ASSERT_ALMOST_EQUAL(
+      F(i, i), fuel.getNuFission() * dx_fuel * dy_fuel, 0.0000001);
   }
   for (size_t i = 10; i < 20; i++) {
-    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+    ASSERT_ALMOST_EQUAL(F(i, i),
+      reflector.getNuFission() * dx_reflector * dy_reflector, 0.0000001);
   }
   for (size_t i = 20; i < 30; i++) {
-    ASSERT_EQUAL(F(i, i), fuel.getNuFission());
+    ASSERT_ALMOST_EQUAL(
+      F(i, i), fuel.getNuFission() * dx_fuel * dy_fuel, 0.0000001);
   }
   for (size_t i = mesh.getSize() - 20; i < mesh.getSize(); i++) {
-    ASSERT_EQUAL(F(i, i), reflector.getNuFission());
+    ASSERT_ALMOST_EQUAL(F(i, i),
+      reflector.getNuFission() * dx_reflector * dy_reflector, 0.0000001);
   }
 }
 
