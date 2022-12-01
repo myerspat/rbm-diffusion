@@ -35,15 +35,13 @@ TEST(test_checkIndexing)
   std::pair<size_t, size_t> idx_row = std::make_pair(7, 8);
   std::pair<size_t, size_t> idx_col = std::make_pair(9, 10);
 
-  // Initializing MeshElement
+  // Initialize MeshElement
   mesh::MeshElement element(mat, lx, ly, id, idx_row, idx_col);
 
-  std::pair row_idx = std::make_pair(7, 8);
-  std::pair col_idx = std::make_pair(9, 10);
+  // checking negative indexing for row
+  std::pair row_idx = std::make_pair(-1, 1);
+  std::pair col_idx = std::make_pair(1, 1);
 
-  // checking negative indexing for rows
-  row_idx = std::make_pair(-1, 1);
-  col_idx = std::make_pair(1, 1);
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
 
   // checking negative indexing for columns
@@ -51,11 +49,12 @@ TEST(test_checkIndexing)
   col_idx = std::make_pair(-1, 1);
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
 
-  // checking if first > second for row indexing
+  // checking if first > last for row index
   row_idx = std::make_pair(2, 1);
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
 
-  // checking if first > last for col and row idx
+  // checking if first > last for col indexow_idx, col_idx) == false);
+
   row_idx = std::make_pair(1, 1);
   col_idx = std::make_pair(2, 1);
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
