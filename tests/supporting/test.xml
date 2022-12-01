@@ -3,7 +3,7 @@
 <rbm>
   <materials>
     <material name="fuel" absorption="0.10" nu_fission="0.11" D="2.0"/>
-    <material name="reflector" absorption="0.01" nu_fission="0.0" D="1.5"/>
+    <material name="reflector" absorption="0.01" nu_fission="0.0000001" D="1.5"/>
   </materials>
 
   <rbm>
@@ -11,12 +11,12 @@
       <values>0.05 0.10 0.15</values>
     </training>
     <target>
-      <values>0.11</values>
+      <values>0.04 0.06 0.07 0.08 0.09 0.11 0.12 0.13 0.14 0.16</values>
     </target>
   </rbm> 
 
   <mesh>
-    <cartesian_mesh fine_x_bins="75" fine_y_bins="75" course_x_bins="2" course_y_bins="2">
+    <cartesian_mesh fine_x_bins="20" fine_y_bins="20" course_x_bins="2" course_y_bins="2">
       <element id="0" material="fuel" x_length="30.0" y_length="30.0" start_row_idx="0" stop_row_idx="0" start_col_idx="0" stop_col_idx="0"/>
       <element id="1" material="reflector" x_length="10.0" y_length="30.0" start_row_idx="0" stop_row_idx="0" start_col_idx="1" stop_col_idx="1"/>
       <element id="1" material="reflector" x_length="30.0" y_length="10.0" start_row_idx="1" stop_row_idx="1" start_col_idx="0" stop_col_idx="0"/>
