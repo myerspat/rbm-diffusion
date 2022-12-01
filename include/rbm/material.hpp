@@ -50,7 +50,7 @@ public:
   // Getters
 
   /// Getter function to retrieve the private variable _name. Which is the name
-  /// of the function
+  /// of the material.
   ///
   /// @return _name
   const std::string& getName() const { return _name; };
