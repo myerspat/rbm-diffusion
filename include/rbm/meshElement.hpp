@@ -22,8 +22,11 @@ public:
 
   //=========================================================================================
   // Methods
+  
 bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std::pair<std::size_t, std::size_t>& idx_col);
+  
 //=========================================================================================
+
   // Getters
   const Material& getMaterial() const { return _mat; };
   const std::size_t& getID() const { return _id; };

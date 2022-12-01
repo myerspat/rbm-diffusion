@@ -170,7 +170,19 @@ rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
   xt::xarray<double> training_points =
     xt::adapt(util::parseString<double>(training_node, "values"));
 
-  return rbm::Perturb(training_points, mesh, element_id, target_parameter);
+  // Create Purturb object
+  rbm::Perturb perturb(training_points, mesh, element_id, target_parameter);
+
+  // Determine number of PCAs to preserve, default is 3
+  if (auto attr = training_node.attribute("pcas")) {
+    perturb.setNumPCs(attr.as_int());
+  } else if (training_points.shape(0) < 3) {
+    // If the number of training points given is less than the default (3)
+    // reduce number of PCs kept
+    perturb.setNumPCs(training_points.shape(0));
+  }
+
+  return perturb;
 }
 
 } // namespace util

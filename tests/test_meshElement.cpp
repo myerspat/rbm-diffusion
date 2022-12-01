@@ -41,6 +41,7 @@ TEST(test_checkIndexing)
   // checking negative indexing for row
   std::pair row_idx = std::make_pair(-1, 1);
   std::pair col_idx = std::make_pair(1, 1);
+
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
 
   // checking negative indexing for columns
@@ -53,6 +54,7 @@ TEST(test_checkIndexing)
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));
 
   // checking if first > last for col indexow_idx, col_idx) == false);
+
   row_idx = std::make_pair(1, 1);
   col_idx = std::make_pair(2, 1);
   ASSERT_FALSE(element.checkIndexing(row_idx, col_idx));

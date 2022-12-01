@@ -8,7 +8,9 @@ class Material {
 public:
   //========================================================================
   // Constructor / Destructor
+
   Material() {};
+  /// Constructor of the Material class.
   Material(const std::string& name, const double& absorption,
     const double& nu_fission, const double& D)
     : _name(name), _absorption(absorption), _nu_fission(nu_fission), _D(D) {};
