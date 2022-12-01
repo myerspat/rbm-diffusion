@@ -40,9 +40,6 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
   // Calculate total variance
   double total_variance = xt::sum(_variance)(0);
 
-  // Variance
-  _variance = xt::square(L) / (training_fluxes.shape(0) - 1);
-
   // Reduce subspace to the first PCs to _num_pcs
   double var = 0.0;
   for (size_t i = 0; i < _num_pcs; i++) {
@@ -72,12 +69,6 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
     auto center = xt::view(training_fluxes, i, xt::all());
     center += col_means;
   }
-
-  // Normalize to 1
-  training_fluxes /= xt::norm_l2(training_fluxes);
-
-  // Write PCA data
-  writePCAData();
 }
 
 xt::xarray<double> Perturb::constructF_t(
@@ -181,6 +172,12 @@ void Perturb::train()
 
   // reduce to PxP
   pcaReduce(_training_fluxes);
+
+  // Normalize to 1
+  _training_fluxes /= xt::norm_l2(_training_fluxes);
+
+  // Write PCA data
+  writePCAData();
 }
 
 void Perturb::calcTargets()
