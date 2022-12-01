@@ -5,9 +5,9 @@
 #include <string>
 /// Contains all the properties of a material for a diffusion problem
 ///
-/// This includes the diffusion coefficient, D, Fission Cross Section,
-/// nu_fission, absorption cross section, absorption, and  the name of the
-/// material, name.
+/// This includes the diffusion coefficient (D), fission cross section,
+/// (nu_fission) absorption cross section (absorption), and the name of the
+/// material (name).
 class Material {
 public:
   //========================================================================
