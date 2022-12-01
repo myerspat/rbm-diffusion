@@ -57,6 +57,7 @@ public:
 
   //=========================================================================================
   // Methods
+<<<<<<< HEAD
   //
   /// checkIndexing is a user error checking function
   ///
@@ -76,6 +77,13 @@ public:
   bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row,
     const std::pair<std::size_t, std::size_t>& idx_col);
   //=========================================================================================
+=======
+  
+bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std::pair<std::size_t, std::size_t>& idx_col);
+  
+//=========================================================================================
+
+>>>>>>> 4080e48147c52580a9504ab8dd2ea74205fa2b14
   // Getters
   //
   /// Getter function for material.
