@@ -10,13 +10,16 @@ void Material::setParameter(
 {
   switch (target_parameter) {
 
-  case rbm::absorption:
+  case rbm::Parameter::absorption:
     _absorption = new_value;
+    break;
 
-  case rbm::D:
+  case rbm::Parameter::D:
     _D = new_value;
+    break;
 
-  case rbm::nu_fission:
+  case rbm::Parameter::nu_fission:
     _nu_fission = new_value;
+    break;
   }
 }
