@@ -32,7 +32,7 @@ public:
   /// This is the constructor the the MeshElement class
   ///
   /// The constructor takes a material, lengths in the x direction, length
-  /// in the y direction, id, and two pairs of indexing for rows and columns.
+  /// in the y direction, id, and two pairs of indices for rows and columns.
   /// @param mat is the material information for a given position of a spacial
   /// structure.
   /// @param lx is the length in the x direction of the MeshElement's material
