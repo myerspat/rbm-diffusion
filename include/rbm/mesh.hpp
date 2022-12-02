@@ -15,7 +15,7 @@ namespace mesh {
 /// 4 boundary conditions and xN's/yN's for both a course and fine grid.
 ///
 /// The mesh class takes input for boundary conditions for a 2D diffusion
-/// problem(This problem can also be 1D, but a new constructor is used) along
+/// problem along
 /// with a vector of MeshElements and iterative chunks to make a grid.
 ///
 /// The MeshElement vector should be filled with MeshElements to make a 2D grid,
