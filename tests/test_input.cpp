@@ -64,7 +64,7 @@ TEST(test_parseString_1)
   std::vector<int> values = util::parseString<int>(node, "values");
 
   // Asssert the data read in is 0 1 2 3 4
-  for (int i = 0; i < values.size(); i++) {
+  for (int i = 0; i < 5; i++) {
     ASSERT_EQUAL(values[i], i);
   }
 }
@@ -91,7 +91,7 @@ TEST(test_parseMaterialsNode_1)
   ASSERT_EQUAL(materials[0].getD(), 2.0);
   ASSERT_EQUAL(materials[1].getName(), "reflector");
   ASSERT_EQUAL(materials[1].getAbsorption(), 0.01);
-  ASSERT_EQUAL(materials[1].getNuFission(), 0.0);
+  ASSERT_EQUAL(materials[1].getNuFission(), 1e-7);
   ASSERT_EQUAL(materials[1].getD(), 1.5);
 }
 
@@ -110,9 +110,9 @@ TEST(test_parseMeshNode_1)
   // Parse and build mesh
   mesh::Mesh mesh = util::parseMeshNode(root);
 
-  ASSERT_EQUAL(mesh.getXN(), 150);
-  ASSERT_EQUAL(mesh.getYN(), 150);
-  ASSERT_EQUAL(mesh.getSize(), 22500);
+  ASSERT_EQUAL(mesh.getXN(), 40);
+  ASSERT_EQUAL(mesh.getYN(), 40);
+  ASSERT_EQUAL(mesh.getSize(), 1600);
 }
 
 TEST(test_parseRBMNode_1)
