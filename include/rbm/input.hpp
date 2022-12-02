@@ -13,23 +13,41 @@
 namespace util {
 
 // Load xml_document
+/// loadFile() takes in xml file to run the code
+///
+/// @params file is a xml file object to open and read xml information
+/// @params file_name is a string to the path of the xml file
+/// @warnings if file not found then it throws a runtime error
 void loadFile(pugi::xml_document& file, const std::string& file_name);
 
-// Get child of pugi node
+/// Get child of pugi node
+/// @params node is the xml node found when loading the file
+/// @params child_name is the name of the child to be found
+///@warnings If the child node cant be found then it throws a runtime error
 pugi::xml_node getNode(
   const pugi::xml_node& node, const std::string& child_name);
 
-// Parse materials node
+/// Parse materials node
+/// @params root is the root xml node
+///@retusn a vector of materials
 std::vector<Material> parseMaterialsNode(const pugi::xml_node& root);
 
-// Parse mesh node and build Mesh
+/// Parse mesh node and build Mesh
+/// @params root is the root xml node
+/// @returns mesh information
 mesh::Mesh parseMeshNode(const pugi::xml_node& root);
 
-// Parse rbm node and build Perturb class
-rbm::Perturb parseRBMNode(
-  const pugi::xml_node& root, mesh::Mesh& mesh);
+/// Parse rbm node and build Perturb class
+/// @params root takes in information to make Perturb object via the root xml
+/// node
+/// @params mesh the built mesh object is used to construct the Perturb Object
+/// @returns a Purturb oject based off the information from in the xml file.
+rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh);
 
-// Get node attribute as type T
+/// Get node attribute as type T
+/// @params node is a xml node from input file
+/// @params attribute is the attribute of the specific node being used
+/// @warnings If node does not have an attribute then a runtime error is thrown.
 template<typename T>
 T getAttribute(const pugi::xml_node& node, const std::string& attribute)
 {
@@ -46,7 +64,10 @@ T getAttribute(const pugi::xml_node& node, const std::string& attribute)
                            " does not have an attribute named " + attribute);
 }
 
-// Parse an XML child node
+/// Parse an XML child node
+/// @params node is an xml from the input file
+/// @value is the value being looked for in the node
+/// @warnings If no value is found in the node then throws a runtime error.
 template<typename T>
 std::vector<T> parseString(const pugi::xml_node& node, const std::string& value,
   const std::string& delimiter = " ")
