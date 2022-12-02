@@ -29,7 +29,7 @@ namespace mesh {
 /// the course grid.
 ///
 /// Once the course grid is made then the fine grid can be made. Depending on
-/// the users input a single MeshElement is brocken down into a N x M grid. Each
+/// the user's input a single MeshElement is broken down into a N x M grid. Each
 /// MeshElements fine grid is still connected together by their respective (top,
 /// bottom, left, right) MeshElements orientation in the course grid.
 ///
