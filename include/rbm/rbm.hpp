@@ -24,6 +24,7 @@ namespace rbm {
 /// 4. Constructs the target Fission Matrix, F^t_ij = <flux_i
 /// |F(alpha_t)|flux_j>, and the target Migration Matrix ,M^t_ij =
 /// <flux_i|M(alpha_t)|flux_j>, based of the training fluxes.\n
+/// 5. Solve for the target criticality and target fluxes.\n
 ///
 class Perturb {
 public:
@@ -31,10 +32,16 @@ public:
   // Constructors / Destructor
   Perturb() {};
   /// Constructor is given all the information in order for a perturbation to
-  /// happen
+  /// happen and then finding the
   ///
   ///@param training_points is a vector of information that allows a mesh's
-  /// material information in a grid to be changed.
+  /// material information in a grid to be changed. Training points can be
+  /// absorption cross section, fission cross section, and D. Both target points
+  /// and training points are of the same type.
+  /// @param target_points is a vectory of information that allows the class to
+  /// solve for target points specified by the user. Target points can be
+  /// absorption cross section, fission cross section, and D. Both target points
+  /// and training points are of the same type.
   ///@param mesh is a Mesh object which constructs and holds the grid in which
   /// the finite different will take place.
   ///@param element_id is the id given to the mesh object in order to know which
@@ -42,6 +49,7 @@ public:
   ///@param target_parameter is the paramter in which to be changed. This
   /// specified what material information the training_points are (nu_fission,
   /// absorption, D).
+  ///
   Perturb(xt::xarray<double>& training_points,
     xt::xarray<double>& target_points, mesh::Mesh& mesh, size_t& element_id,
     Parameter& target_parameter)
@@ -68,8 +76,9 @@ public:
     xt::xarray<double>& training_points, mesh::Mesh& mesh, size_t& element_id);
 
   // Create the training subspace
-  /// train() creates three different training subspace (traning points,
-  /// training fluxes, training k).
+  /// train() creates a default of three different training subspace (traning
+  /// points, training fluxes, training k) unless specified otherwise by the
+  /// user.
   ///
   /// The training fluxes fluxes and training k arrays need to be calculated
   /// by,\n
@@ -91,9 +100,8 @@ public:
   ///   3. Finding the eigen values and iegen vectors of the M and F matricies\n
   ///   4. returns the information of predicted fluxes and predicted
   ///   criticality\n
-  ///@param target_value the material information given to predict the flux and
-  /// criticality relative to the most accurate numerical solution.
-  ///@returns the predicted flux array and preicted criticality value
+  ///@returns nothing, but the the predicted flux array and predicted
+  /// criticality value in stored in _target_fluxes  and _target_k respectively.
   void calcTargets();
 
   // Reduce the subspace using principle component analysis
@@ -112,6 +120,8 @@ public:
     xt::xarray<double> eigenvalues, xt::xarray<double> eigenvectors);
 
   // Check errors
+  /// Calculates the percent error for both criticality, k, and fluxes of the
+  /// target data and training data.
   void checkError();
 
   // Construct the target fission matrix
@@ -135,16 +145,26 @@ public:
   void setNumPCs(const size_t num_pcs) { _num_pcs = num_pcs; }
 
   // Write data to file_name
+  // Writes training data, target data, and error data to files
+  // training.csv, target.csv, and error,csv respectively.
+  // @param file_name
   void writePointData(const std::string& file_name,
     const xt::xarray<double>& points, const xt::xarray<double>& k,
     const xt::xarray<double>& fluxes);
 
   // Write PCA data to reduced.csv
+  /// Writes reduction data from PCA to reduce.csv.
+  /// Also calles writePointData to write the data to their respetive files.
   void writePCAData();
 
   //=============================================================
   // Getters
+  /// Getter function to get the number of training points input by the user.
+  /// @returns total number of training points
   const size_t getNumTraining() const { return _training_points.size(); };
+
+  /// Getter function to get the number of target points input by the user
+  ///@returns total number of target points
   const size_t getNumTarget() const { return _target_points.size(); };
 
 private:
