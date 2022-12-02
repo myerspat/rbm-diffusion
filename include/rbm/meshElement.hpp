@@ -31,7 +31,7 @@ public:
   MeshElement() {};
   /// This is the constructor the the MeshElement class
   ///
-  /// The constructor takes the a material, lengths in the x direction, length
+  /// The constructor takes a material, lengths in the x direction, length
   /// in the y direction, id, and two pairs of indexing for rows and columns.
   /// @param mat is the material information for a given position of a spacial
   /// structure.
