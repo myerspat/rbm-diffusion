@@ -9,7 +9,7 @@ namespace mesh {
 
 /// MeshElement class allows you to create a piece of a course mesh.
 ///
-/// Mesh Element are put together to form a course mesh. These are the physical
+/// MeshElements are put together to form a course mesh. These are the physical
 /// structures that make up a model of the diffusion model being represented.
 /// Each mesh element is given indexes where the position in the rows and
 /// columns of a grid where the meshElemented should be orientated along with
