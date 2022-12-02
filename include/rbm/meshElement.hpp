@@ -12,7 +12,7 @@ namespace mesh {
 /// MeshElements are put together to form a course mesh. These are the physical
 /// structures that make up a model of the diffusion model being represented.
 /// Each mesh element is given indexes where the position in the rows and
-/// columns of a grid where the meshElemented should be orientated along with
+/// columns of a grid where the MeshElements should be orientated along with
 /// its material length in the x direction and length in the y direction.
 ///\n
 /// Example: physcial representation MeshElement \n
