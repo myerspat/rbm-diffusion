@@ -1,0 +1,44 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+
+<rbm>
+  <materials>
+    <material name="fuel1" absorption="0.10" nu_fission="0.10" D="0.5"/>
+    <material name="fuel2" absorption="0.10" nu_fission="0.10" D="0.4"/>
+    <material name="fuel1+rod" absorption="0.13" nu_fission="0.11" D="0.4"/>
+    <material name="reflector" absorption="0.01" nu_fission="0.00000000001" D="0.3"/>
+  </materials>
+
+  <rbm>
+    <training element_id="1" parameter="absorption" pcas="1">
+      <values>0.09 0.095 0.10 0.105 0.11</values>
+    </training>
+    <target>
+      <values>0.08 0.08040404040404041 0.08080808080808081 0.08121212121212121 0.08161616161616161 0.08202020202020202 0.08242424242424243 0.08282828282828283 0.08323232323232323 0.08363636363636363 0.08404040404040404 0.08444444444444445 0.08484848484848485 0.08525252525252525 0.08565656565656565 0.08606060606060606 0.08646464646464647 0.08686868686868687 0.08727272727272728 0.08767676767676767 0.08808080808080808 0.08848484848484849 0.08888888888888889 0.0892929292929293 0.08969696969696969 0.0901010101010101 0.0905050505050505 0.09090909090909091 0.09131313131313132 0.09171717171717172 0.09212121212121212 0.09252525252525252 0.09292929292929293 0.09333333333333334 0.09373737373737373 0.09414141414141414 0.09454545454545454 0.09494949494949495 0.09535353535353536 0.09575757575757576 0.09616161616161616 0.09656565656565656 0.09696969696969697 0.09737373737373738 0.09777777777777777 0.09818181818181818 0.09858585858585858 0.09898989898989899 0.0993939393939394 0.0997979797979798 0.10020202020202021 0.1006060606060606 0.10101010101010101 0.10141414141414141 0.10181818181818182 0.10222222222222221 0.10262626262626262 0.10303030303030303 0.10343434343434343 0.10383838383838384 0.10424242424242425 0.10464646464646464 0.10505050505050505 0.10545454545454545 0.10585858585858586 0.10626262626262625 0.10666666666666666 0.10707070707070707 0.10747474747474747 0.10787878787878788 0.10828282828282829 0.10868686868686869 0.10909090909090909 0.10949494949494949 0.1098989898989899 0.1103030303030303 0.1107070707070707 0.1111111111111111 0.11151515151515151 0.11191919191919192 0.11232323232323232 0.11272727272727273 0.11313131313131314 0.11353535353535353 0.11393939393939394 0.11434343434343433 0.11474747474747474 0.11515151515151514 0.11555555555555555 0.11595959595959596 0.11636363636363636 0.11676767676767677 0.11717171717171718 0.11757575757575757 0.11797979797979798 0.11838383838383838 0.11878787878787878 0.11919191919191918 0.11959595959595959 0.12</values>
+    </target>
+  </rbm> 
+
+  <mesh>
+    <cartesian_mesh fine_x_bins="10" fine_y_bins="10" course_x_bins="5" course_y_bins="5">
+      <element id="0" material="fuel1+rod" x_length="10.0" y_length="10.0" start_row_idx="0" stop_row_idx="0" start_col_idx="0" stop_col_idx="0"/>
+      <element id="1" material="fuel1" x_length="20.0" y_length="10.0" start_row_idx="0" stop_row_idx="0" start_col_idx="1" stop_col_idx="1"/>
+      <element id="0" material="fuel1+rod" x_length="20.0" y_length="10.0" start_row_idx="0" stop_row_idx="0" start_col_idx="2" stop_col_idx="2"/>
+      <element id="2" material="fuel2" x_length="20.0" y_length="10.0" start_row_idx="0" stop_row_idx="0" start_col_idx="3" stop_col_idx="3"/>
+      <element id="3" material="reflector" x_length="20.0" y_length="10.0" start_row_idx="0" stop_row_idx="0" start_col_idx="4" stop_col_idx="4"/>
+      <element id="1" material="fuel1" x_length="10.0" y_length="20.0" start_row_idx="1" stop_row_idx="1" start_col_idx="0" stop_col_idx="0"/>
+      <element id="1" material="fuel1" x_length="20.0" y_length="20.0" start_row_idx="1" stop_row_idx="1" start_col_idx="1" stop_col_idx="2"/>
+      <element id="2" material="fuel2" x_length="20.0" y_length="20.0" start_row_idx="1" stop_row_idx="3" start_col_idx="3" stop_col_idx="3"/>
+      <element id="3" material="reflector" x_length="20.0" y_length="20.0" start_row_idx="1" stop_row_idx="3" start_col_idx="4" stop_col_idx="4"/>
+      <element id="0" material="fuel1+rod" x_length="10.0" y_length="20.0" start_row_idx="2" stop_row_idx="2" start_col_idx="0" stop_col_idx="0"/>
+      <element id="1" material="fuel1" x_length="20.0" y_length="20.0" start_row_idx="2" stop_row_idx="2" start_col_idx="1" stop_col_idx="1"/>
+      <element id="0" material="fuel1+rod" x_length="20.0" y_length="20.0" start_row_idx="2" stop_row_idx="2" start_col_idx="2" stop_col_idx="2"/>
+      <element id="2" material="fuel2" x_length="10.0" y_length="20.0" start_row_idx="3" stop_row_idx="3" start_col_idx="0" stop_col_idx="0"/>
+      <element id="2" material="fuel2" x_length="20.0" y_length="20.0" start_row_idx="3" stop_row_idx="3" start_col_idx="1" stop_col_idx="2"/>
+      <element id="3" material="reflector" x_length="10.0" y_length="20.0" start_row_idx="4" stop_row_idx="4" start_col_idx="0" stop_col_idx="0"/>
+      <element id="3" material="reflector" x_length="20.0" y_length="20.0" start_row_idx="4" stop_row_idx="4" start_col_idx="1" stop_col_idx="4"/>
+    </cartesian_mesh>
+    <left_condition a="0.0" b="1.0"/>
+    <right_condition a="1.0" b="-2.0"/>
+    <top_condition a="1.0" b="-2.0"/>
+    <bottom_condition a="0.0" b="1.0"/>
+  </mesh>
+</rbm>

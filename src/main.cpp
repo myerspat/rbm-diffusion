@@ -63,9 +63,6 @@ int main(int argc, char* argv[])
   // Find online time
   std::chrono::duration<double> online_time = end - start;
 
-  // Calculate error
-  parameter.checkError();
-
   // Print offline timing results
   std::cout << std::setprecision(5)
             << "\n Offline Time = " << offline_time.count()
@@ -78,6 +75,9 @@ int main(int argc, char* argv[])
             << " s | Average Time per Target Point = "
             << online_time.count() / parameter.getNumTarget() << " s"
             << std::endl;
+
+  // Calculate error
+  parameter.checkError();
 
   // Print finishing time
   std::time_t end_time = std::chrono::system_clock::to_time_t(end);

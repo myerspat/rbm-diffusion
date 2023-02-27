@@ -1,6 +1,8 @@
 #include "rbm/rbm.hpp"
 #include "xtensor/xcsv.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xmath.hpp"
+#include "xtensor/xslice.hpp"
 #include "xtensor/xtensor_forward.hpp"
 #include <cstdio>
 #include <fstream>
@@ -10,29 +12,33 @@
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xnorm.hpp>
+#include <xtensor/xsort.hpp>
 #include <xtensor/xview.hpp>
 
 namespace rbm {
 
 void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
 {
-  // Center flux data
-  xt::xarray<double> col_means = xt::mean(training_fluxes, 0);
-  for (size_t i = 0; i < training_fluxes.shape(0); i++) {
-    auto center = xt::view(training_fluxes, i, xt::all());
-    center -= col_means;
-  }
-
   // Rank of flux data
   size_t rank = xt::linalg::matrix_rank(training_fluxes);
+  if (rank < _num_pcs) {
+    printf("\n Warning: Rank of training fluxes matrix is less than the number "
+           "of PCs, finding number of PCs based on variance\n");
+    _num_pcs = 0;
+  }
 
   // Singular value decomposition
-  auto [U, L, At] = xt::linalg::svd(training_fluxes);
+  auto [U, L, At] = xt::linalg::svd(training_fluxes, false);
 
-  // Extract U, L, and A' (At) from X = ULA'
-  // l is given as a row vector but is really a diagonal metrix that is
-  // rank x rank
-  U = xt::view(U, xt::all(), xt::range(0, rank));
+  // Flip eigenvectors' sign to ensure deterministic output
+  auto max_abs_col = xt::argmax(xt::abs(U), 0);
+  xt::xarray<double> signs(max_abs_col.size());
+  for (size_t i = 0; i < max_abs_col.size(); i++) {
+    auto sign = U(max_abs_col(i), i) / std::abs(U(max_abs_col(i), i));
+
+    xt::col(U, i) *= sign;
+    xt::row(At, i) *= sign;
+  }
 
   // Variance
   _variance = xt::square(L) / (training_fluxes.shape(0) - 1);
@@ -40,35 +46,33 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
   // Calculate total variance
   double total_variance = xt::sum(_variance)(0);
 
-  // Reduce subspace to the first PCs to _num_pcs
+  // If _num_pcs is zero use variance to determine subspace size
+  // else use the number defined by the user
   double var = 0.0;
-  for (size_t i = 0; i < _num_pcs; i++) {
-    var += _variance(i);
+  if (_num_pcs == 0) {
+    while (var < 0.9 * total_variance) {
+      var += _variance(_num_pcs);
+      _num_pcs++;
+    }
+
+    std::cout << "\n Preserved " << var / total_variance * 100
+              << " % of the variance with " << _num_pcs << " PCs\n\n";
+  } else {
+    // If the _num_pcs was not zero reduced to user defined number
+    for (size_t i = 0; i < _num_pcs; i++) {
+      var += _variance(i);
+    }
+
+    // Throw warning if the number of PCs preserved is less than 90% of the
+    // total variance
+    if (var < 0.9 * total_variance) {
+      printf("\n Warning: Subspace was reduced to %lu PCs which has only %lg "
+             "percent of the total variance\n",
+        _num_pcs, var / total_variance * 100);
+    }
   }
 
-  // Throw warning if the number of PCs preserved is less than 90% of the total
-  // variance
-  if (var < 0.9 * total_variance) {
-    printf("\n Warning: Subspace was reduced to %lu PCs which has only %lg "
-           "percent of the total variance\n",
-      _num_pcs, var / total_variance * 100);
-  }
-
-  // Reduced U, L, and At
-  xt::xarray<double> U_r = xt::view(U, xt::all(), xt::range(0, _num_pcs));
-  xt::xarray<double> L_r = xt::view(L, xt::range(0, _num_pcs));
-  xt::xarray<double> At_r =
-    xt::view(At, xt::range(0, _num_pcs), xt::range(0, _num_pcs));
-
-  // Calculate reduced training_fluxes
-  training_fluxes = xt::linalg::dot(U_r, xt::linalg::dot(xt::diag(L_r), At_r));
-
-  // Uncenter training_fluxes with col_means from 0 to num_pcs
-  col_means = xt::view(col_means, xt::range(0, _num_pcs));
-  for (size_t i = 0; i < training_fluxes.shape(0); i++) {
-    auto center = xt::view(training_fluxes, i, xt::all());
-    center += col_means;
-  }
+  training_fluxes = xt::view(U, xt::all(), xt::range(0, _num_pcs));
 }
 
 xt::xarray<double> Perturb::constructF_t(
@@ -129,7 +133,7 @@ std::pair<double, xt::xarray<double>> Perturb::findMaxEigen(
     }
   }
 
-  return std::make_pair(eigenvalues(idx), xt::abs(xt::col(eigenvectors, idx)));
+  return std::make_pair(eigenvalues(idx), xt::col(eigenvectors, idx));
 }
 
 void Perturb::train()
@@ -137,7 +141,7 @@ void Perturb::train()
   // Prompt user of training begun
   printf("\n Begin training\n");
 
-  // full training_fluxes and training_k
+  // Initialize training_fluxes and training_k
   _training_fluxes = xt::xarray<double>::from_shape(
     {_mesh.getSize(), _training_points.shape(0)});
   _training_k = xt::xarray<double>::from_shape({_training_points.shape(0)});
@@ -159,7 +163,7 @@ void Perturb::train()
       findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
 
     _training_k(i) = fundamental.first;
-    xt::col(_training_fluxes, i) = fundamental.second;
+    xt::col(_training_fluxes, i) = xt::abs(fundamental.second);
 
     // Update user
     printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _training_points(i),
@@ -171,10 +175,14 @@ void Perturb::train()
     "training.csv", _training_points, _training_k, _training_fluxes);
 
   // reduce to PxP
-  pcaReduce(_training_fluxes);
+  if (_training_points.size() != 1) {
+    pcaReduce(_training_fluxes);
+  }
 
-  // Normalize to 1
-  _training_fluxes /= xt::norm_l2(_training_fluxes);
+  // Ensure fluxes are normalized to 1
+  for (size_t i = 0; i < _training_fluxes.shape(1); i++) {
+    xt::col(_training_fluxes, i) /= xt::norm_l2(xt::col(_training_fluxes, i));
+  }
 
   // Write PCA data
   writePCAData();
@@ -214,13 +222,14 @@ void Perturb::calcTargets()
 
     // Calculate approximate target flux using the sum of ritz vector *
     // _training_fluxes
-    for (size_t j = 0; j < _training_points.size(); j++) {
+    for (size_t j = 0; j < _training_fluxes.shape(1); j++) {
       xt::col(_target_fluxes, i) +=
-        fundamental.second(j) * xt::col(_training_fluxes, j);
+        (fundamental.second(j) * xt::col(_training_fluxes, j));
     }
 
     // Normlize target fluxes
-    xt::col(_target_fluxes, i) /= xt::norm_l2(xt::col(_target_fluxes, i));
+    xt::col(_target_fluxes, i) = xt::abs(xt::col(_target_fluxes, i)) /
+                                 xt::norm_l2(xt::col(_target_fluxes, i));
 
     // Update user
     printf("   Point %lu = %3lg => k = %6lg\n", i + 1, _target_points(i),
@@ -257,7 +266,7 @@ void Perturb::checkError()
       findMaxEigen(xt::real(eigenvalues), xt::real(eigenvectors));
 
     exact_target_k(i) = fundamental.first;
-    xt::col(exact_target_fluxes, i) = fundamental.second;
+    xt::col(exact_target_fluxes, i) = xt::abs(fundamental.second);
 
     // Calculate relative error
     error(i) = (exact_target_k(i) - _target_k(i)) / exact_target_k(i);
