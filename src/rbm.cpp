@@ -72,15 +72,7 @@ void Perturb::pcaReduce(xt::xarray<double>& training_fluxes)
     }
   }
 
-  // Reduced U and multiply U and L to get PCs
-  training_fluxes =
-    xt::linalg::dot(xt::view(U, xt::all(), xt::range(0, _num_pcs)),
-      xt::diag(xt::view(L, xt::range(0, _num_pcs))));
-
-  // Ensure fluxes are normalized to 1
-  for (size_t i = 0; i < training_fluxes.shape(1); i++) {
-    xt::col(training_fluxes, i) /= xt::norm_l2(xt::col(training_fluxes, i));
-  }
+  training_fluxes = xt::view(U, xt::all(), xt::range(0, _num_pcs));
 }
 
 xt::xarray<double> Perturb::constructF_t(
@@ -185,6 +177,11 @@ void Perturb::train()
   // reduce to PxP
   if (_training_points.size() != 1) {
     pcaReduce(_training_fluxes);
+  }
+
+  // Ensure fluxes are normalized to 1
+  for (size_t i = 0; i < _training_fluxes.shape(1); i++) {
+    xt::col(_training_fluxes, i) /= xt::norm_l2(xt::col(_training_fluxes, i));
   }
 
   // Write PCA data
