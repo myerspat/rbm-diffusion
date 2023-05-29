@@ -4,12 +4,14 @@
 #include <cmath>
 #include <xtensor-blas/xlinalg.hpp>
 #include <xtensor/xarray.hpp>
-#include <xtensor/xoperation.hpp>
 #include <xtensor/xmath.hpp>
 #include <xtensor/xnorm.hpp>
+#include <xtensor/xoperation.hpp>
 
 TEST(regression_test_2D_mesh)
 {
+  using namespace material;
+
   // Initialize materials
   Material fuel("fuel", 0.10, 0.1109662271, 2.0);
 

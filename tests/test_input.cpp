@@ -82,7 +82,7 @@ TEST(test_parseMaterialsNode_1)
   auto root = util::getNode(doc, "rbm");
 
   // Parse materials node
-  std::vector<Material> materials = util::parseMaterialsNode(root);
+  std::vector<material::Material> materials = util::parseMaterialsNode(root);
 
   // Assertions
   ASSERT_EQUAL(materials[0].getName(), "fuel");

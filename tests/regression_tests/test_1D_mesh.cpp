@@ -5,6 +5,8 @@
 
 TEST(regression_test_1D_mesh)
 {
+  using namespace material;
+
   // Initialize materials
   Material fuel("fuel", 0.10, 0.11, 2.0);
 

@@ -34,11 +34,34 @@ pugi::xml_node getNode(
   return child;
 }
 
-std::vector<Material> parseMaterialsNode(const pugi::xml_node& root)
+Settings parseSettingsNode(const pugi::xml_node& root)
+{
+  Settings settings;
+
+  if (auto settings_node = root.child("settings")) {
+    if (auto training_path = settings_node.attribute("training")) {
+      // Parse training path
+      settings.training_path = training_path.as_string();
+
+    } else if (auto pcs_path = settings_node.attribute("pcs")) {
+      // Parse pcs path
+      settings.pcs_path = pcs_path.as_string();
+    }
+
+    if (auto calc_errors = settings_node.attribute("calc_errors")) {
+      // Parse calculate errors bool
+      settings.calc_errors = calc_errors.as_bool();
+    }
+  }
+
+  return settings;
+}
+
+std::vector<material::Material> parseMaterialsNode(const pugi::xml_node& root)
 {
   // Get materials node
   pugi::xml_node materials_node = util::getNode(root, "materials");
-  std::vector<Material> materials;
+  std::vector<material::Material> materials;
 
   // Iterate through all material nodes and fill materials vector
   for (pugi::xml_node material_node = util::getNode(materials_node, "material");
@@ -59,7 +82,7 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
   std::cout << "\n   Parsing mesh XML node\n";
 
   // Get material node
-  std::vector<Material> materials = util::parseMaterialsNode(root);
+  std::vector<material::Material> materials = util::parseMaterialsNode(root);
 
   // Get mesh node from root
   pugi::xml_node mesh_node = util::getNode(root, "mesh");
@@ -128,7 +151,7 @@ mesh::Mesh parseMeshNode(const pugi::xml_node& root)
     std::string material_str =
       util::getAttribute<std::string>(element_node, "material");
     auto material_itr = std::find_if(materials.cbegin(), materials.cend(),
-      [&](const Material& a) { return a.getName() == material_str; });
+      [&](const material::Material& a) { return a.getName() == material_str; });
 
     // Check that the material was found in the vector
     if (material_itr == materials.cend()) {
@@ -160,72 +183,87 @@ rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh)
   // Get rbm node
   pugi::xml_node rbm_node = util::getNode(root, "rbm");
 
-  // Get training node
-  pugi::xml_node training_node = util::getNode(rbm_node, "training");
+  // Get parameters for multi-parameter perturbation
+  std::vector<rbm::Parameter> parameters;
+  bool constructD = false;
+  for (pugi::xml_node parameter_node = util::getNode(rbm_node, "parameter");
+       parameter_node;
+       parameter_node = parameter_node.next_sibling("parameter")) {
+    // Parse region/meshElement ID and property
+    size_t id = util::getAttribute<std::size_t>(parameter_node, "element_id");
+    std::string property_str =
+      util::getAttribute<std::string>(parameter_node, "property");
 
-  // Get target node
-  pugi::xml_node target_node = util::getNode(rbm_node, "target");
+    // Convert string to enum
+    material::Property property;
+    if (property_str == "absorption") {
+      property = material::Property::absorption;
+    } else if (property_str == "nu_fission") {
+      property = material::Property::nu_fission;
+    } else if (property_str == "D") {
+      property = material::Property::D;
+      constructD = true;
+    } else {
+      throw std::runtime_error("The property provided (" + property_str +
+                               ") is not absorption, nu_fission, or D");
+    }
 
-  // Get cell id that will be perturbed
-  size_t element_id = util::getAttribute<int>(training_node, "element_id");
+    // Parse training and target points from parameter node
+    xt::xarray<double> training_points =
+      xt::adapt(util::parseString<double>(parameter_node, "training"));
+    xt::xarray<double> target_points =
+      xt::adapt(util::parseString<double>(parameter_node, "target"));
 
-  // Get target parameter
-  std::string parameter =
-    util::getAttribute<std::string>(training_node, "parameter");
+    parameters.emplace_back(id, property, training_points, target_points);
 
-  // Convert target parameter to enum value
-  rbm::Parameter target_parameter;
-  if (parameter == "absorption") {
-    target_parameter = rbm::Parameter::absorption;
-  } else if (parameter == "nu_fission") {
-    target_parameter = rbm::Parameter::nu_fission;
-  } else if (parameter == "D") {
-    target_parameter = rbm::Parameter::D;
-  } else {
-    throw std::runtime_error("The parameter provided (" + parameter +
-                             ") is not absorption, nu_fission, or D");
+    // Print target parameter and ID of elements to be perturbed
+    std::cout << "     Perturbing elements of ID = " << id << std::endl;
+    std::cout << "     Target property: " + property_str << std::endl;
   }
 
-  // Print target parameter and ID of elements to be perturbed
-  std::cout << "     Target parameter: " + parameter << std::endl;
-  std::cout << "     Perturbing elements of ID = " << element_id << std::endl;
+  // Assert the perturbation arrays are the same size
+  size_t training_length = parameters[0].getTrainingPoints().size();
+  size_t target_length = parameters[0].getTargetPoints().size();
+  for (size_t i = 1; i < parameters.size(); i++) {
+    assert(training_length == parameters[i].getTrainingPoints().size());
+    assert(target_length == parameters[i].getTargetPoints().size());
+  }
 
-  // Parse training fluxes
-  xt::xarray<double> training_points =
-    xt::adapt(util::parseString<double>(training_node, "values"));
-
-  // Print number of training points
-  std::cout << "     Number of training points = " << training_points.size()
-            << std::endl;
-
-  // Parse target points
-  xt::xarray<double> target_points =
-    xt::adapt(util::parseString<double>(target_node, "values"));
-
-  // Create Purturb object
-  rbm::Perturb perturb(
-    training_points, target_points, mesh, element_id, target_parameter);
+  // Construct perturb object
+  rbm::Perturb perturb(parameters, mesh, constructD);
 
   // Determine number of PCAs to preserve, default is 3
   size_t num_pcs = 3;
-  if (auto attr = training_node.attribute("pcas")) {
-    perturb.setNumPCs(attr.as_int());
+  if (auto attr = rbm_node.attribute("pcs")) {
     num_pcs = attr.as_int();
+    perturb.setNumPCs(num_pcs);
 
-  } else if (training_points.shape(0) < 3) {
-    // If the number of training points given is less than the default (3)
-    // reduce number of PCs kept
-    perturb.setNumPCs(training_points.shape(0));
-    num_pcs = training_points.shape(0);
+  } else if (training_length < 3) {
+    num_pcs = training_length;
+    perturb.setNumPCs(num_pcs);
+  }
+
+  // Determine if EIM will be used default to true (only used on diffusion
+  // perturbations)
+  if (auto attr = rbm_node.attribute("EIM")) {
+    perturb.setEIM(attr.as_bool());
+  }
+
+  // Precompute with affine decomposition
+  if (auto attr = rbm_node.attribute("precompute")) {
+    perturb.setPrecompute(attr.as_bool());
+  }
+
+  // Read FOPT attribute if applicable
+  if (auto attr = rbm_node.attribute("FOPT")) {
+    perturb.setFOPT(attr.as_bool());
   }
 
   // Print size of subspace
-  std::cout << "     Reduced number of training points = " << num_pcs
-            << std::endl;
+  std::cout << "     Number of PCs = " << num_pcs << std::endl;
 
   // Print number of target points
-  std::cout << "     Number of target points = " << target_points.size()
-            << std::endl;
+  std::cout << "     Number of target points = " << target_length << std::endl;
 
   return perturb;
 }

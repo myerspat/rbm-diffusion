@@ -3,14 +3,22 @@
 
 #include "rbm/material.hpp"
 #include "rbm/mesh.hpp"
+#include "rbm/parameter.hpp"
 #include "rbm/rbm.hpp"
 #include <cassert>
 #include <map>
 #include <pugixml.hpp>
 #include <string>
 #include <vector>
+#include <xtensor/xarray.hpp>
 
 namespace util {
+
+struct Settings {
+  std::string training_path = "";
+  std::string pcs_path = "";
+  bool calc_errors = true;
+};
 
 // Load xml_document
 void loadFile(pugi::xml_document& file, const std::string& file_name);
@@ -19,15 +27,17 @@ void loadFile(pugi::xml_document& file, const std::string& file_name);
 pugi::xml_node getNode(
   const pugi::xml_node& node, const std::string& child_name);
 
+// Parse settings node
+Settings parseSettingsNode(const pugi::xml_node& root);
+
 // Parse materials node
-std::vector<Material> parseMaterialsNode(const pugi::xml_node& root);
+std::vector<material::Material> parseMaterialsNode(const pugi::xml_node& root);
 
 // Parse mesh node and build Mesh
 mesh::Mesh parseMeshNode(const pugi::xml_node& root);
 
 // Parse rbm node and build Perturb class
-rbm::Perturb parseRBMNode(
-  const pugi::xml_node& root, mesh::Mesh& mesh);
+rbm::Perturb parseRBMNode(const pugi::xml_node& root, mesh::Mesh& mesh);
 
 // Get node attribute as type T
 template<typename T>

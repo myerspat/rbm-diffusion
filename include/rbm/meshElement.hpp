@@ -12,7 +12,7 @@ public:
   //=========================================================================================
   // Constructors / Destructor
   MeshElement() {};
-  MeshElement(const Material& mat, const double& lx, const double& ly,
+  MeshElement(const material::Material& mat, const double& lx, const double& ly,
     const std::size_t& id, const std::pair<std::size_t, std::size_t>& idx_row,
     const std::pair<std::size_t, std::size_t>& idx_col)
     : _idx_row(idx_row), _idx_col(idx_col), _lx(lx), _ly(ly), _id(id), _mat(mat)
@@ -22,13 +22,14 @@ public:
 
   //=========================================================================================
   // Methods
-  
-bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std::pair<std::size_t, std::size_t>& idx_col);
-  
-//=========================================================================================
+
+  bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row,
+    const std::pair<std::size_t, std::size_t>& idx_col);
+
+  //=========================================================================================
 
   // Getters
-  const Material& getMaterial() const { return _mat; };
+  const material::Material& getMaterial() const { return _mat; };
   const std::size_t& getID() const { return _id; };
   const std::pair<std::size_t, std::size_t>& getRowIdx() const
   {
@@ -44,7 +45,7 @@ bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std
   //=========================================================================================
   // Setters
   void setParameter(
-    const double& new_value, const rbm::Parameter& target_parameter)
+    const double& new_value, const material::Property& target_parameter)
   {
     _mat.setParameter(new_value, target_parameter);
   };
@@ -52,7 +53,7 @@ bool checkIndexing(const std::pair<std::size_t, std::size_t>& idx_row, const std
 private:
   //=========================================================================================
   // Data
-  Material _mat;
+  material::Material _mat;
   std::pair<std::size_t, std::size_t> _idx_row, _idx_col;
   double _lx;
   double _ly;

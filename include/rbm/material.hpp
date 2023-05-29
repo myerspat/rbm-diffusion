@@ -1,8 +1,11 @@
 #ifndef _MATERIAL_
 #define _MATERIAL_
 
-#include "rbm/rbmEnums.hpp"
 #include <string>
+
+namespace material {
+
+enum Property { absorption, D, nu_fission };
 
 class Material {
 public:
@@ -30,8 +33,7 @@ public:
   //========================================================================
   // Setters
   // Set the value of a target_parameter
-  void setParameter(
-    const double& new_value, const rbm::Parameter& target_parameter);
+  void setParameter(const double& new_value, const Property& target_property);
 
 private:
   //========================================================================
@@ -41,5 +43,7 @@ private:
   double _nu_fission;
   double _D;
 };
+
+} // namespace material
 
 #endif // !_MATERIAL_

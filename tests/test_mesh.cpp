@@ -8,6 +8,8 @@
 
 TEST(test_constructM_1)
 {
+  using namespace material;
+
   // This problem tests the 1D implementation of constructM
 
   // Initialize materials
@@ -57,6 +59,8 @@ TEST(test_constructM_1)
 
 TEST(test_constructFineGrid_1)
 {
+  using namespace material;
+
   // Initialize materials
   Material fuel("fuel", 0.10, 0.11, 2.0);
   Material reflector("reflector", 0.01, 0.0, 1.5);
@@ -136,6 +140,8 @@ TEST(test_constructFineGrid_1)
 
 TEST(test_constructCourseGrid_1)
 {
+  using namespace material;
+
   // Material 1
   Material mat_1("fuel", 0.10, 0.11, 2.0);
 
@@ -179,6 +185,8 @@ TEST(test_constructCourseGrid_1)
 
 TEST(test_constructF_1)
 {
+  using namespace material;
+
   // Initialize materials
   Material fuel("fuel", 0.10, 0.11, 2.0);
   Material reflector("reflector", 0.01, 0.0, 1.5);
@@ -246,6 +254,8 @@ TEST(test_constructF_1)
 
 TEST(test_CheckSharedLengths)
 {
+  using namespace material;
+
   // Initialize materials
   Material fuel("fuel", 0.10, 0.11, 2.0);
   Material reflector("reflector", 0.01, 0.0, 1.5);
@@ -338,6 +348,7 @@ TEST(test_CheckSharedLengths)
 
 TEST(test_changeMaterial_course_and_fine)
 {
+  using namespace material;
 
   // Initialize materials
   Material fuel("fuel", 0.10, 0.11, 2.0);
@@ -384,7 +395,7 @@ TEST(test_changeMaterial_course_and_fine)
   // Changing material in course grid
   int id = 1;
   double new_value = 0.210;
-  rbm::Parameter target_parameter = rbm::Parameter::absorption;
+  Property target_parameter = Property::absorption;
   mesh.changeMaterial(id, new_value, target_parameter);
   xt::xarray<mesh::MeshElement> my_course_grid = mesh.getCourseGrid();
 

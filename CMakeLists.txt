@@ -40,6 +40,7 @@ list(APPEND rbm_SOURCES
   src/material.cpp
   src/meshElement.cpp
   src/rbm.cpp
+  src/region.cpp
 )
 
 # Archived source files

@@ -1,8 +1,10 @@
 #ifndef _MESH_
 #define _MESH_
 
+#include "rbm/material.hpp"
 #include "rbm/meshElement.hpp"
-#include "rbm/rbmEnums.hpp"
+#include "rbm/parameter.hpp"
+#include "rbm/region.hpp"
 #include <cassert>
 #include <utility>
 #include <vector>
@@ -15,8 +17,10 @@ class Mesh {
 private:
   //========================================================================
   // Data
-  xt::xarray<MeshElement> _fine_grid;      // Mesh centered elements
-  xt::xarray<MeshElement> _course_grid;    // Mesh centered elements
+  xt::xarray<MeshElement> _fine_grid;   // Mesh centered elements
+  xt::xarray<MeshElement> _course_grid; // Mesh centered elements
+  std::vector<Region> _regions;
+  xt::xarray<double> _D_matrix;
   std::pair<double, double> _left_bound;   // Left boundary condition
   std::pair<double, double> _right_bound;  // Right boundary condition
   std::pair<double, double> _top_bound;    // Top boundary condition
@@ -55,6 +59,9 @@ public:
   xt::xarray<MeshElement> constructCourseGrid(
     const std::vector<MeshElement>& elements);
 
+  // Print course grid
+  void printCourseGrid(const xt::xarray<MeshElement>& course_grid);
+
   // Construct fine grid
   xt::xarray<MeshElement> constructFineGrid(
     const xt::xarray<MeshElement>& course_grid);
@@ -64,10 +71,14 @@ public:
 
   // Change target mesh elements' material property
   void changeMaterial(const std::size_t& id, const double& new_value,
-    const rbm::Parameter& target_parameter);
+    const material::Property& target_property);
 
   xt::xarray<double> constructF(); // Construct the fission operator matrix
   xt::xarray<double> constructM(); // Construct the migration operator matrix
+  xt::xarray<double>
+  constructD(); // Construct the migration shell consisting of only D
+
+  void updateD(std::vector<rbm::Parameter>& parameters, std::size_t& idx);
 
   // Assuming row major ordering, returns 1D idx given 2D idx
   size_t ravelIDX(const size_t& i, const size_t& j);
@@ -88,6 +99,12 @@ public:
 
   // Gets the fine grid
   xt::xarray<MeshElement> getFineGrid() const { return _fine_grid; }
+
+  // Gets the regions vector
+  std::vector<Region> getRegions() const { return _regions; }
+
+  // Gets the migration matrix shell
+  xt::xarray<double> getDMatrix() const { return _D_matrix; }
 };
 
 } // namespace mesh

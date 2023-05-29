@@ -42,14 +42,21 @@ int main(int argc, char* argv[])
   assert(xml_file.child("rbm"));
   pugi::xml_node rbm_root = util::getNode(xml_file, "rbm");
 
+  // Parse settings node
+  util::Settings settings = util::parseSettingsNode(rbm_root);
+
   // Build mesh from xml file
   mesh::Mesh mesh = util::parseMeshNode(rbm_root);
 
   // Build target pertubation parameter
-  rbm::Perturb parameter = util::parseRBMNode(rbm_root, mesh);
+  rbm::Perturb perturb = util::parseRBMNode(rbm_root, mesh);
 
   // Build subspace
-  parameter.train();
+  if (settings.training_path == "" && settings.pcs_path == "") {
+    perturb.train();
+  } else if (settings.training_path != "") {
+    perturb.loadFluxes(settings.training_path);
+  }
 
   // End offline section timing
   end = std::chrono::system_clock::now();
@@ -57,7 +64,11 @@ int main(int argc, char* argv[])
 
   // Calculate eigenvectors/values for target parameter values
   start = std::chrono::system_clock::now();
-  parameter.calcTargets();
+  if (!perturb.getFOPT()) {
+    perturb.calcTargets();
+  } else {
+    perturb.foptCalcTargets();
+  }
   end = std::chrono::system_clock::now();
 
   // Find online time
@@ -67,17 +78,19 @@ int main(int argc, char* argv[])
   std::cout << std::setprecision(5)
             << "\n Offline Time = " << offline_time.count()
             << " s | Average Time per Training Point = "
-            << offline_time.count() / parameter.getNumTraining() << " s"
+            << offline_time.count() / perturb.getNumTraining() << " s"
             << std::endl;
 
   // Print online timing results
   std::cout << std::setprecision(5) << " Online Time = " << online_time.count()
             << " s | Average Time per Target Point = "
-            << online_time.count() / parameter.getNumTarget() << " s"
+            << online_time.count() / perturb.getNumTarget() << " s"
             << std::endl;
 
   // Calculate error
-  parameter.checkError();
+  if (settings.calc_errors) {
+    perturb.checkError();
+  }
 
   // Print finishing time
   std::time_t end_time = std::chrono::system_clock::to_time_t(end);

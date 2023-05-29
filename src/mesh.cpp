@@ -1,11 +1,14 @@
 #include "rbm/mesh.hpp"
 #include "rbm/meshElement.hpp"
+#include "rbm/region.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xslice.hpp"
 #include "xtensor/xview.hpp"
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <cstdio>
 #include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
 
 namespace mesh {
 
@@ -14,8 +17,30 @@ void Mesh::constructMesh(const std::vector<MeshElement>& elements)
   // Construct course grid
   _course_grid = constructCourseGrid(elements);
 
+  // Print course grid
+  printCourseGrid(_course_grid);
+
   // Construct fine grid
   _fine_grid = constructFineGrid(_course_grid);
+
+  // IDs vector to keep track of unique ids
+  std::vector<size_t> ids = {};
+  ids.reserve(elements.size());
+  _regions.reserve(elements.size());
+
+  // For each element determine if its ID is unique and emplace back regions
+  for (const auto& element : elements) {
+    if (std::find(ids.begin(), ids.end(), element.getID()) != ids.end()) {
+      continue;
+    } else {
+      ids.push_back(element.getID());
+    }
+
+    _regions.emplace_back(
+      _fine_grid, _xN_fine, _yN_fine, element.getID(), element.getMaterial());
+  }
+
+  _D_matrix = constructD();
 }
 
 xt::xarray<MeshElement> Mesh::constructCourseGrid(
@@ -40,6 +65,18 @@ xt::xarray<MeshElement> Mesh::constructCourseGrid(
   assert(checkSharedLengths(course_grid));
 
   return course_grid;
+}
+
+void Mesh::printCourseGrid(const xt::xarray<MeshElement>& course_grid)
+{
+  std::cout << "     Mesh" << std::endl;
+  for (size_t i = course_grid.shape(0) - 1; i != -1; i--) {
+    std::cout << "      ";
+    for (size_t j = 0; j < course_grid.shape(1); j++) {
+      std::cout << " " << course_grid(i, j).getID();
+    }
+    std::cout << std::endl;
+  }
 }
 
 xt::xarray<MeshElement> Mesh::constructFineGrid(
@@ -113,40 +150,53 @@ bool Mesh::checkSharedLengths(const xt::xarray<MeshElement>& course_grid)
 }
 
 void Mesh::changeMaterial(const std::size_t& id, const double& new_value,
-  const rbm::Parameter& target_parameter)
+  const material::Property& target_property)
 {
-  // Iterating over the course mesh and changingg the value needed for a
-  // specific id
-  for (size_t i = 0; i < _course_grid.shape(0); i++) {
-    for (size_t j = 0; j < _course_grid.shape(1); j++) {
-      if (_course_grid.at(i, j).getID() == id) {
-        _course_grid.at(i, j).setParameter(new_value, target_parameter);
-      }
+  for (Region& region : _regions) {
+    // If the region has the correct ID update the material and break out of the
+    // for loop
+    if (region.getID() == id) {
+      region.changeMaterial(new_value, target_property);
+      break;
     }
   }
-  // After reconstructing the course grid the fine mesh must be reconstructed.
-  _fine_grid = constructFineGrid(_course_grid);
 }
 
 xt::xarray<double> Mesh::constructF()
 {
-  // Allocate space for fission operator
-  xt::xarray<double> F = xt::zeros<double>({getSize(), getSize()});
+  // Allocate space
+  xt::xarray<double> F_diag = xt::zeros<double>({getSize()});
 
-  // Fill diagonal array
-  for (size_t i = 0; i < _fine_grid.shape(0); i++) {
-    for (size_t j = 0; j < _fine_grid.shape(1); j++) {
-      // Convert 2D idx to 1D idx assuming row major ordering
-      size_t position = ravelIDX(i, j);
-
-      // Fill diagonal
-      F(position, position) = _fine_grid(i, j).getMaterial().getNuFission() *
-                              _fine_grid(i, j).getLX() / _xN_fine *
-                              _fine_grid(i, j).getLY() / _yN_fine;
-    }
+  // Apply affine combination
+  for (const Region& region : _regions) {
+    F_diag += region.getMat().getNuFission() * region.getMask();
   }
 
+  xt::xarray<double> F = xt::zeros<double>({getSize(), getSize()});
+  for (size_t i = 0; i < getSize(); i++) {
+    F(i, i) = F_diag(i);
+  }
+
+  // Return diagonal array
   return F;
+}
+
+xt::xarray<double> Mesh::constructM()
+{
+  // Allocate space
+  xt::xarray<double> M_diag = xt::zeros<double>({getSize()});
+
+  // Apply affine combination
+  for (const Region& region : _regions) {
+    M_diag += region.getMat().getAbsorption() * region.getMask();
+  }
+
+  xt::xarray<double> M = xt::zeros<double>({getSize(), getSize()});
+  for (size_t i = 0; i < getSize(); i++) {
+    M(i, i) = M_diag(i);
+  }
+
+  return M + _D_matrix;
 }
 
 size_t Mesh::ravelIDX(const size_t& i, const size_t& j)
@@ -154,7 +204,7 @@ size_t Mesh::ravelIDX(const size_t& i, const size_t& j)
   return j + i * getXN();
 }
 
-xt::xarray<double> Mesh::constructM()
+xt::xarray<double> Mesh::constructD()
 {
   // Allocate space
   xt::xarray<double> M = xt::zeros<double>({getSize(), getSize()});
@@ -217,25 +267,21 @@ xt::xarray<double> Mesh::constructM()
     // Left boundary element
     M(ravelIDX(0, 0), ravelIDX(0, 1)) = -a_x(0, 0);
     M(ravelIDX(0, 0), ravelIDX(0, 0)) =
-      _fine_grid(0, 0).getMaterial().getAbsorption() * dx(0, 0) -
-      M(ravelIDX(0, 0), ravelIDX(0, 1)) + a_xb(0, 0, _left_bound);
+      -M(ravelIDX(0, 0), ravelIDX(0, 1)) + a_xb(0, 0, _left_bound);
 
     // Length (no edges)
     for (size_t j = 1; j < x_last; j++) {
       M(ravelIDX(0, j), ravelIDX(0, j + 1)) = -a_x(0, j);
       M(ravelIDX(0, j), ravelIDX(0, j - 1)) = -a_x(0, j - 1);
       M(ravelIDX(0, j), ravelIDX(0, j)) =
-        _fine_grid(0, j).getMaterial().getAbsorption() * dx(0, j) * dy(0, j) -
-        M(ravelIDX(0, j), ravelIDX(0, j + 1)) -
+        -M(ravelIDX(0, j), ravelIDX(0, j + 1)) -
         M(ravelIDX(0, j), ravelIDX(0, j - 1));
     }
 
     // Right boundary element
     M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) = -a_x(0, x_last - 1);
     M(ravelIDX(0, x_last), ravelIDX(0, x_last)) =
-      _fine_grid(0, x_last).getMaterial().getAbsorption() * dx(0, x_last) *
-        dy(0, x_last) -
-      M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) +
+      -M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) +
       a_xb(0, x_last, _right_bound);
 
   } else {
@@ -243,8 +289,7 @@ xt::xarray<double> Mesh::constructM()
     M(ravelIDX(0, 0), ravelIDX(0, 1)) = -a_x(0, 0);
     M(ravelIDX(0, 0), ravelIDX(1, 0)) = -a_y(0, 0);
     M(ravelIDX(0, 0), ravelIDX(0, 0)) =
-      _fine_grid(0, 0).getMaterial().getAbsorption() * dx(0, 0) * dy(0, 0) -
-      M(ravelIDX(0, 0), ravelIDX(0, 1)) - M(ravelIDX(0, 0), ravelIDX(1, 0)) +
+      -M(ravelIDX(0, 0), ravelIDX(0, 1)) - M(ravelIDX(0, 0), ravelIDX(1, 0)) +
       a_xb(0, 0, _left_bound) + a_yb(0, 0, _bottom_bound);
 
     // Bottom edge (no corners)
@@ -253,8 +298,7 @@ xt::xarray<double> Mesh::constructM()
       M(ravelIDX(0, j), ravelIDX(1, j)) = -a_y(0, j);
       M(ravelIDX(0, j), ravelIDX(0, j - 1)) = -a_x(0, j - 1);
       M(ravelIDX(0, j), ravelIDX(0, j)) =
-        _fine_grid(0, j).getMaterial().getAbsorption() * dx(0, j) * dy(0, j) -
-        M(ravelIDX(0, j), ravelIDX(0, j + 1)) -
+        -M(ravelIDX(0, j), ravelIDX(0, j + 1)) -
         M(ravelIDX(0, j), ravelIDX(1, j)) -
         M(ravelIDX(0, j), ravelIDX(0, j - 1)) + a_yb(0, j, _bottom_bound);
     }
@@ -263,9 +307,7 @@ xt::xarray<double> Mesh::constructM()
     M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) = -a_x(0, x_last - 1);
     M(ravelIDX(0, x_last), ravelIDX(1, x_last)) = -a_y(0, x_last);
     M(ravelIDX(0, x_last), ravelIDX(0, x_last)) =
-      _fine_grid(0, x_last).getMaterial().getAbsorption() * dx(0, x_last) *
-        dy(0, x_last) -
-      M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) -
+      -M(ravelIDX(0, x_last), ravelIDX(0, x_last - 1)) -
       M(ravelIDX(0, x_last), ravelIDX(1, x_last)) +
       a_xb(0, x_last, _right_bound) + a_yb(0, x_last, _bottom_bound);
 
@@ -275,8 +317,7 @@ xt::xarray<double> Mesh::constructM()
       M(ravelIDX(i, 0), ravelIDX(i + 1, 0)) = -a_y(i, 0);
       M(ravelIDX(i, 0), ravelIDX(i - 1, 0)) = -a_y(i - 1, 0);
       M(ravelIDX(i, 0), ravelIDX(i, 0)) =
-        _fine_grid(i, 0).getMaterial().getAbsorption() * dx(i, 0) * dy(i, 0) -
-        M(ravelIDX(i, 0), ravelIDX(i, 1)) -
+        -M(ravelIDX(i, 0), ravelIDX(i, 1)) -
         M(ravelIDX(i, 0), ravelIDX(i + 1, 0)) -
         M(ravelIDX(i, 0), ravelIDX(i - 1, 0)) + a_xb(i, 0, _left_bound);
 
@@ -284,9 +325,7 @@ xt::xarray<double> Mesh::constructM()
       M(ravelIDX(i, x_last), ravelIDX(i + 1, x_last)) = -a_y(i, x_last);
       M(ravelIDX(i, x_last), ravelIDX(i - 1, x_last)) = -a_y(i - 1, x_last);
       M(ravelIDX(i, x_last), ravelIDX(i, x_last)) =
-        _fine_grid(i, x_last).getMaterial().getAbsorption() * dx(i, x_last) *
-          dy(i, x_last) -
-        M(ravelIDX(i, x_last), ravelIDX(i, x_last - 1)) -
+        -M(ravelIDX(i, x_last), ravelIDX(i, x_last - 1)) -
         M(ravelIDX(i, x_last), ravelIDX(i + 1, x_last)) -
         M(ravelIDX(i, x_last), ravelIDX(i - 1, x_last)) +
         a_xb(i, x_last, _right_bound);
@@ -296,9 +335,7 @@ xt::xarray<double> Mesh::constructM()
     M(ravelIDX(y_last, 0), ravelIDX(y_last, 1)) = -a_x(y_last, 0);
     M(ravelIDX(y_last, 0), ravelIDX(y_last - 1, 0)) = -a_y(y_last - 1, 0);
     M(ravelIDX(y_last, 0), ravelIDX(y_last, 0)) =
-      _fine_grid(y_last, 0).getMaterial().getAbsorption() * dx(y_last, 0) *
-        dy(y_last, 0) -
-      M(ravelIDX(y_last, 0), ravelIDX(y_last, 1)) -
+      -M(ravelIDX(y_last, 0), ravelIDX(y_last, 1)) -
       M(ravelIDX(y_last, 0), ravelIDX(y_last - 1, 0)) +
       a_xb(y_last, 0, _left_bound) + a_yb(y_last, 0, _top_bound);
 
@@ -308,9 +345,7 @@ xt::xarray<double> Mesh::constructM()
       M(ravelIDX(y_last, j), ravelIDX(y_last - 1, j)) = -a_y(y_last - 1, j);
       M(ravelIDX(y_last, j), ravelIDX(y_last, j - 1)) = -a_x(y_last, j - 1);
       M(ravelIDX(y_last, j), ravelIDX(y_last, j)) =
-        _fine_grid(y_last, j).getMaterial().getAbsorption() * dx(y_last, j) *
-          dy(y_last, j) -
-        M(ravelIDX(y_last, j), ravelIDX(y_last, j + 1)) -
+        -M(ravelIDX(y_last, j), ravelIDX(y_last, j + 1)) -
         M(ravelIDX(y_last, j), ravelIDX(y_last - 1, j)) -
         M(ravelIDX(y_last, j), ravelIDX(y_last, j - 1)) +
         a_yb(y_last, 0, _top_bound);
@@ -322,9 +357,7 @@ xt::xarray<double> Mesh::constructM()
     M(ravelIDX(y_last, x_last), ravelIDX(y_last - 1, x_last)) =
       -a_y(y_last - 1, x_last);
     M(ravelIDX(y_last, x_last), ravelIDX(y_last, x_last)) =
-      _fine_grid(y_last, x_last).getMaterial().getAbsorption() *
-        dx(y_last, x_last) * dy(y_last, x_last) -
-      M(ravelIDX(y_last, x_last), ravelIDX(y_last, x_last - 1)) -
+      -M(ravelIDX(y_last, x_last), ravelIDX(y_last, x_last - 1)) -
       M(ravelIDX(y_last, x_last), ravelIDX(y_last - 1, x_last)) +
       a_xb(y_last, x_last, _right_bound) + a_yb(y_last, x_last, _top_bound);
 
@@ -336,8 +369,7 @@ xt::xarray<double> Mesh::constructM()
         M(ravelIDX(i, j), ravelIDX(i, j + 1)) = -a_x(i, j);
         M(ravelIDX(i, j), ravelIDX(i + 1, j)) = -a_y(i, j);
         M(ravelIDX(i, j), ravelIDX(i, j)) =
-          _fine_grid(i, j).getMaterial().getAbsorption() * dx(i, j) * dy(i, j) -
-          M(ravelIDX(i, j), ravelIDX(i, j - 1)) -
+          -M(ravelIDX(i, j), ravelIDX(i, j - 1)) -
           M(ravelIDX(i, j), ravelIDX(i - 1, j)) -
           M(ravelIDX(i, j), ravelIDX(i, j + 1)) -
           M(ravelIDX(i, j), ravelIDX(i + 1, j));
@@ -346,6 +378,28 @@ xt::xarray<double> Mesh::constructM()
   }
 
   return M;
+}
+
+void Mesh::updateD(std::vector<rbm::Parameter>& parameters, std::size_t& idx)
+{
+  // Construct course grid
+  for (rbm::Parameter& parameter : parameters) {
+    if (parameter.getMaterialProperty() == material::Property::D) {
+      for (size_t i = 0; i < _course_grid.shape(0); i++) {
+        for (size_t j = 0; j < _course_grid.shape(1); j++) {
+          if (_course_grid.at(i, j).getID() == parameter.getID()) {
+            _course_grid.at(i, j).setParameter(
+              parameter.getTargetPoints()(idx), material::Property::D);
+          }
+        }
+      }
+    }
+  }
+
+  // Construct fine grid
+  _fine_grid = constructFineGrid(_course_grid);
+
+  _D_matrix = constructD();
 }
 
 } // namespace mesh

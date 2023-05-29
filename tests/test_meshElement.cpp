@@ -6,7 +6,7 @@
 TEST(test_MeshElement_1)
 {
   // Private variables
-  Material mat("fuel", 1, 2, 3);
+  material::Material mat("fuel", 1, 2, 3);
   double lx = 4;
   double ly = 5;
   size_t id = 6;
@@ -28,7 +28,7 @@ TEST(test_checkIndexing)
 {
 
   // Private variables
-  Material mat("fuel", 3, 6, 9);
+  material::Material mat("fuel", 3, 6, 9);
   double lx = 4;
   double ly = 5;
   size_t id = 0;

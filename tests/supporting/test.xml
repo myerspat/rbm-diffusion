@@ -6,13 +6,19 @@
     <material name="reflector" absorption="0.01" nu_fission="0.0000001" D="1.5"/>
   </materials>
 
-  <rbm>
-    <training element_id="0" parameter="absorption" pcas="2">
-      <values>0.09 0.10 0.11</values>
-    </training>
-    <target>
-      <values>0.06 0.07 0.08 0.09 0.11 0.12 0.13 0.14</values>
-    </target>
+  <rbm pcas="2" EIM="false" precompute="true">
+    <parameter element_id="0" property="nu_fission">
+      <training>0.10 0.11 0.12</training>
+      <target>0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14</target>
+    </parameter>
+    <parameter element_id="0" property="absorption">
+      <training>0.09 0.10 0.11</training>
+      <target>0.06 0.07 0.08 0.09 0.11 0.12 0.13 0.14</target>
+    </parameter>
+    <parameter element_id="1" property="D">
+      <training>1.5 2.0 2.5</training>
+      <target>1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00</target>
+    </parameter>
   </rbm> 
 
   <mesh>

@@ -1,25 +1,28 @@
 #include "rbm/material.hpp"
-#include "rbm/rbmEnums.hpp"
+
+namespace material {
 
 void Material::initialize(
   std::string name, double absorption, double nu_fission, double D)
 {}
 
 void Material::setParameter(
-  const double& new_value, const rbm::Parameter& target_parameter)
+  const double& new_value, const Property& target_property)
 {
-  switch (target_parameter) {
+  switch (target_property) {
 
-  case rbm::Parameter::absorption:
+  case Property::absorption:
     _absorption = new_value;
     break;
 
-  case rbm::Parameter::D:
+  case Property::D:
     _D = new_value;
     break;
 
-  case rbm::Parameter::nu_fission:
+  case Property::nu_fission:
     _nu_fission = new_value;
     break;
   }
 }
+
+} // namespace material
